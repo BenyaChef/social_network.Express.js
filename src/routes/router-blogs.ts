@@ -23,11 +23,15 @@ blogRouter.post('/',
     inputValidationMiddleware,
     (req: Request, res: Response) => {
    const newBlog = blogsRepository.createNewBlog(req.body)
-   if(!newBlog) res.sendStatus(404)
+   if(!newBlog) res.sendStatus(400)
        res.status(201).send(newBlog)
 })
 
-blogRouter.put('/:id', authorizationMiddleware, (req: Request, res: Response) => {
+blogRouter.put('/:id',
+    authorizationMiddleware,
+    blogValidationMiddleware,
+    inputValidationMiddleware,
+    (req: Request, res: Response) => {
     const isUpdate = blogsRepository.updateBlogByID(req.params.id, req.body)
     if(!isUpdate) res.sendStatus(404)
     res.sendStatus(204)

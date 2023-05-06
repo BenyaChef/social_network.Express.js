@@ -12,6 +12,7 @@ app.get('/', (req: Request, res: Response) => {
     res.status(200).send('Hello my friend!')
 })
 
+
 app.use('/blog', blogRouter)
 app.use('/post', postRouter)
 app.use('/testing', testingRouter)
