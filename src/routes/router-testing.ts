@@ -3,9 +3,9 @@ import {blogsDB} from "../db/blogsDB";
 import {postDB} from "../db/postDB";
 
 
-export const testingRouter = Router({})
+export const testRouter = Router({})
 
-testingRouter.delete('/all-data', (req: Request, res: Response) => {
+testRouter.delete('/all-data', (req: Request, res: Response) => {
     blogsDB.splice(0)
     postDB.splice(0)
     res.sendStatus(204)
