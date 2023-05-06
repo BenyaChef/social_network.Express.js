@@ -8,5 +8,5 @@ export const testingRouter = Router({})
 testingRouter.delete('/all-data', (req: Request, res: Response) => {
     blogsDB.splice(0)
     postDB.splice(0)
-    res.status(204).send("All data is delete!")
+    res.sendStatus(204)
 })
