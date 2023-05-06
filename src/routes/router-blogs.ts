@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {blogsRepository} from "../repositories/blogs-repository";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {blogValidationMiddleware} from "../middlewares/blog-validation-middleware";
-import {inputValidation} from "../middlewares/input-validation";
+import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 
 
 export const blogRouter = Router({})
@@ -20,7 +20,7 @@ blogRouter.get('/:id', (req: Request, res: Response) => {
 blogRouter.post('/',
     authorizationMiddleware,
     blogValidationMiddleware,
-    inputValidation,
+    inputValidationMiddleware,
     (req: Request, res: Response) => {
    const newBlog = blogsRepository.createNewBlog(req.body)
    if(!newBlog) res.sendStatus(404)
