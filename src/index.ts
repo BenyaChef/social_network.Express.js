@@ -8,14 +8,10 @@ const port = process.env.PORT || 3003
 
 app.use(express.json())
 
-app.get('/', (req: Request, res: Response) => {
-    res.status(200).send('Hello my friend!')
-})
-
-
+app.use('/testing', testingRouter)
 app.use('/blog', blogRouter)
 app.use('/post', postRouter)
-app.use('/testing', testingRouter)
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
