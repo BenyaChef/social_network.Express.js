@@ -9,8 +9,8 @@ const port = process.env.PORT || 3003
 app.use(express.json())
 
 // app.use('/testing', testRouter)
-app.use('/blog', blogRouter)
-app.use('/post', postRouter)
+app.use('/blogs', blogRouter)
+app.use('/posts', postRouter)
 
 
 app.listen(port, () => {
