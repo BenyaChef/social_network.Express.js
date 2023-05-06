@@ -3,6 +3,9 @@ import {blogsRepository} from "../repositories/blogs-repository";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {blogValidationMiddleware} from "../middlewares/blog-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
+import {postDB} from "../db/postDB";
+import {postRouter} from "./router-posts";
+import {blogsDB} from "../db/blogsDB";
 
 
 export const blogRouter = Router({})
@@ -40,5 +43,9 @@ blogRouter.put('/:id',
 blogRouter.delete('/:id', authorizationMiddleware, (req: Request, res: Response) => {
     const isDeleted = blogsRepository.deleteBlogByID(req.params.id)
     if(!isDeleted) res.sendStatus(404)
+    res.sendStatus(204)
+})
+blogRouter.delete('/testing/all-data', (req: Request, res: Response) => {
+    blogsDB.splice(0)
     res.sendStatus(204)
 })

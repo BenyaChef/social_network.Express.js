@@ -3,6 +3,7 @@ import {postsRepository} from "../repositories/posts-repository";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {postValidationMiddleware} from "../middlewares/post-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
+import {postDB} from "../db/postDB";
 
 
 export const postRouter = Router({})
@@ -28,5 +29,9 @@ postRouter.put('/:id', authorizationMiddleware, postValidationMiddleware, inputV
 postRouter.delete('/:id', authorizationMiddleware, (req: Request, res: Response) => {
     const isDelete = postsRepository.deletePostByID(req.params.id)
     if(!isDelete) res.sendStatus(404)
+    res.sendStatus(204)
+})
+postRouter.delete('/testing/all-data', (req: Request, res: Response) => {
+    postDB.splice(0)
     res.sendStatus(204)
 })
