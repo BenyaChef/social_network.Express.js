@@ -6,7 +6,7 @@ import {postDB} from "../db/postDB";
 export const testingRouter = Router({})
 
 testingRouter.delete('/all-data', (req: Request, res: Response) => {
-    blogsDB.splice(0)
-    postDB.splice(0)
+    blogsDB.length = 0
+    postDB.length = 0
     res.sendStatus(204)
 })
