@@ -3,7 +3,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {blogValidationMiddleware} from "../middlewares/blog-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
-import {blogsDB} from "../db/blogsDB";
+
 
 
 export const blogRouter = Router({})
