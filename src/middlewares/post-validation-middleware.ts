@@ -1,6 +1,8 @@
 import {body} from "express-validator";
 import {blogsRepository} from "../repositories/blogs-repository";
 
+
+
 const allBodyValues: Array<string> = ['title', 'shortDescription', 'content', 'blogId']
 const [title, shortDescription, content, blogId] = allBodyValues
 

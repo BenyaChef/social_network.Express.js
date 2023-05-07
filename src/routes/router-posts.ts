@@ -31,7 +31,3 @@ postRouter.delete('/:id', authorizationMiddleware, (req: Request, res: Response)
     if(!isDelete) res.sendStatus(404)
     res.sendStatus(204)
 })
-postRouter.delete('/testing/all-data', (req: Request, res: Response) => {
-    postDB.splice(0)
-    res.sendStatus(204)
-})

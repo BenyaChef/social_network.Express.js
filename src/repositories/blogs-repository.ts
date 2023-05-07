@@ -25,7 +25,7 @@ export const blogsRepository = {
     },
 
     updateBlogByID(id: string, body: TypeBlog) {
-        const foundBlog = blogsDB.find(b => b.id === id)
+        const foundBlog: TypeBlog | undefined = blogsDB.find(b => b.id === id)
         if (foundBlog) {
             foundBlog.name = body.name
             foundBlog.description = body.description

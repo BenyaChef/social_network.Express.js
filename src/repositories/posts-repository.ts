@@ -2,8 +2,6 @@ import {postDB} from "../db/postDB";
 import {PostTypeModel} from "../models/postTypeModel";
 import {createNewId} from "../create-new-id";
 import {findBlogID} from "../find-blogID";
-import {param} from "express-validator";
-import {blogsDB} from "../db/blogsDB";
 
 export const postsRepository = {
 
@@ -29,7 +27,7 @@ export const postsRepository = {
     },
 
     updatePostByID(id: string, body: PostTypeModel) {
-        const findPost = postDB.find(p => p.id === id)
+        const findPost: PostTypeModel | undefined = postDB.find(p => p.id === id)
         if(findPost) {
             findPost.title = body.title
             findPost.shortDescription = body.shortDescription
