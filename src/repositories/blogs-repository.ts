@@ -1,20 +1,22 @@
 import {blogsDB} from "../db/blogsDB";
-import {TypeBlog} from "../models/blogsTypeModel";
-import {createNewId} from "../create-new-id";
+import {BlogViewModel} from "../models/blogs-models/BlogViewModel";
+import {createNewId} from "../utils/helpers/create-new-id";
+import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
+import {BlogModel} from "../models/blogs-models/BlogModel";
 
 
 export const blogsRepository = {
 
-    getAllBlogs() {
+    getAllBlogs(): BlogViewModel[] {
         return blogsDB
     },
 
-    findBlogByID(id: string) {
+    findBlogByID(id: string): BlogViewModel | undefined{
         return blogsDB.find(b => b.id === id)
     },
 
-    createNewBlog(body: TypeBlog) {
-        const newBlog: TypeBlog = {
+    createNewBlog(body: CreateBlogModel): BlogViewModel {
+        const newBlog: CreateBlogModel = {
             id: createNewId(),
             name: body.name,
             description: body.description,
@@ -24,8 +26,8 @@ export const blogsRepository = {
         return newBlog;
     },
 
-    updateBlogByID(id: string, body: TypeBlog) {
-        const foundBlog: TypeBlog | undefined = blogsDB.find(b => b.id === id)
+    updateBlogByID(id: string, body: CreateBlogModel): boolean {
+        const foundBlog: BlogModel | undefined = blogsDB.find(b => b.id === id)
         if (foundBlog) {
             foundBlog.name = body.name
             foundBlog.description = body.description
@@ -35,7 +37,7 @@ export const blogsRepository = {
         return false;
     },
 
-    deleteBlogByID(id: string) {
+    deleteBlogByID(id: string): boolean {
         for (let i = 0; i < blogsDB.length; i++) {
             if (blogsDB[i].id === id) {
                 blogsDB.splice(i, 1)

@@ -4,24 +4,33 @@ import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {postValidationMiddleware} from "../middlewares/post-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {postDB} from "../db/postDB";
+import {PostViewModel} from "../models/posts-models/PostViewModel";
 
 
 export const postRouter = Router({})
 
-postRouter.get('/', (req: Request, res: Response) => {
+postRouter.get('/', (req: Request, res: Response<PostViewModel[]>) => {
     res.status(200).send(postsRepository.getAllPost())
 })
-postRouter.get('/:id', (req: Request, res: Response) => {
+postRouter.get('/:id', (req: Request, res: Response<PostViewModel>) => {
     const isFind = postsRepository.findPostByID(req.params.id)
     if (!isFind) res.sendStatus(404)
         res.status(200).send(isFind)
 })
-postRouter.post('/', authorizationMiddleware, postValidationMiddleware, inputValidationMiddleware, (req: Request, res: Response) => {
+postRouter.post('/',
+    authorizationMiddleware,
+    postValidationMiddleware,
+    inputValidationMiddleware,
+    (req: Request, res: Response<PostViewModel>) => {
     const newPost = postsRepository.createNewPost(req.body)
     if(!newPost) res.sendStatus(400)
     res.status(201).send(newPost)
 })
-postRouter.put('/:id', authorizationMiddleware, postValidationMiddleware, inputValidationMiddleware, (req: Request, res: Response) => {
+postRouter.put('/:id',
+    authorizationMiddleware,
+    postValidationMiddleware,
+    inputValidationMiddleware,
+    (req: Request, res: Response) => {
     const isUpdate = postsRepository.updatePostByID(req.params.id, req.body)
     if(!isUpdate) res.sendStatus(404)
     res.sendStatus(204)

@@ -1,6 +1,6 @@
-import {PostTypeModel} from "../models/postTypeModel";
+import {PostModel} from "../models/posts-models/PostModel";
 
-export const postDB: Array<PostTypeModel> = [{
+export const postDB: PostModel[] = [{
     "id": "1",
     "title": "like",
     "shortDescription": "this is like",

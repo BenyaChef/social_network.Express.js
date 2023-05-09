@@ -2,8 +2,7 @@ import {body} from "express-validator";
 import {blogsRepository} from "../repositories/blogs-repository";
 
 
-
-const allBodyValues: Array<string> = ['title', 'shortDescription', 'content', 'blogId']
+const allBodyValues:  string[] = ['title', 'shortDescription', 'content', 'blogId']
 const [title, shortDescription, content, blogId] = allBodyValues
 
 export const postValidationMiddleware = [
@@ -26,5 +25,11 @@ export const postValidationMiddleware = [
         .exists().withMessage('blogId is not defined')
         .isString().withMessage('incorrect type input value')
         .trim()
-        .custom(value => {return blogsRepository.findBlogByID(value)}).withMessage('there is no blog with this id')
+        .custom(value => {
+            const isFind = blogsRepository.findBlogByID(value)
+            if (!isFind) {
+                throw new Error('blog with this id was not found')
+            }
+            return true
+        })
 ]
