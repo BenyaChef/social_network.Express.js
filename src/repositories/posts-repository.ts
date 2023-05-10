@@ -4,6 +4,7 @@ import {createNewId} from "../utils/helpers/create-new-id";
 import {findBlogID} from "../utils/helpers/find-blogID";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostModel} from "../models/posts-models/PostModel";
+import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 
 export const postsRepository = {
 
@@ -28,7 +29,7 @@ export const postsRepository = {
         return newPost
     },
 
-    updatePostByID(id: string, body: CreatePostModel): boolean {
+    updatePostByID(id: string, body: UpdatePostModel): boolean {
         const findPost: PostModel | undefined = postDB.find(p => p.id === id)
         if(findPost) {
             findPost.title = body.title

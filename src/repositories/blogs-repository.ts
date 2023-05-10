@@ -3,6 +3,7 @@ import {BlogViewModel} from "../models/blogs-models/BlogViewModel";
 import {createNewId} from "../utils/helpers/create-new-id";
 import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
 import {BlogModel} from "../models/blogs-models/BlogModel";
+import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
 
 
 export const blogsRepository = {
@@ -26,7 +27,7 @@ export const blogsRepository = {
         return newBlog;
     },
 
-    updateBlogByID(id: string, body: CreateBlogModel): boolean {
+    updateBlogByID(id: string, body: UpdateBlogModel): boolean {
         const foundBlog: BlogModel | undefined = blogsDB.find(b => b.id === id)
         if (foundBlog) {
             foundBlog.name = body.name

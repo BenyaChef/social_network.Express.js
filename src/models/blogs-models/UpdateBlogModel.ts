@@ -1,5 +1,4 @@
-export type CreateBlogModel = {
-    id: string,
+export interface UpdateBlogModel {
     name: string,
     description: string,
     websiteUrl: string
