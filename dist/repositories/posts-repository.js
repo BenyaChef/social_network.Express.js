@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
 const postDB_1 = require("../db/postDB");
-const create_new_id_1 = require("../create-new-id");
-const find_blogID_1 = require("../find-blogID");
+const create_new_id_1 = require("../utils/helpers/create-new-id");
+const find_blogID_1 = require("../utils/helpers/find-blogID");
 exports.postsRepository = {
     getAllPost() {
         return postDB_1.postDB;

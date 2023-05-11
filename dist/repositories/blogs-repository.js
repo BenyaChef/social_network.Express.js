@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
 const blogsDB_1 = require("../db/blogsDB");
-const create_new_id_1 = require("../create-new-id");
+const create_new_id_1 = require("../utils/helpers/create-new-id");
 exports.blogsRepository = {
     getAllBlogs() {
         return blogsDB_1.blogsDB;

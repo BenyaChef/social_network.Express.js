@@ -7,7 +7,7 @@ const inputValidationMiddleware = (req, res, next) => {
     if (!errors.isEmpty()) {
         res.status(400).json({
             errorsMessages: errors.array({ onlyFirstError: true })
-                .map(e => {
+                .map((e) => {
                 return {
                     message: e.msg,
                     field: e.type === 'field' ? e.path : null
