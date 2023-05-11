@@ -9,31 +9,30 @@ import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../m
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
 
 
-
 export const blogRouter = Router({})
 
-blogRouter.get('/',  (req: Request,
-                      res: Response<BlogViewModel[]>) => {
-    res.status(200).send(blogsRepository.getAllBlogs())
+blogRouter.get('/', async (req: Request,
+                           res: Response<BlogViewModel[]>) => {
+    res.status(200).send(await blogsRepository.getAllBlogs())
 })
 
-blogRouter.get('/:id', (req: RequestWithParams<{id: string}>,
-                        res: Response<BlogViewModel>) => {
-    const foundBlog = blogsRepository.findBlogByID(req.params.id)
-    if(!foundBlog) res.sendStatus(404)
-        res.status(200).send(foundBlog)
+blogRouter.get('/:id', async (req: RequestWithParams<{ id: string }>,
+                        res: Response<BlogViewModel[]>) => {
+    const foundBlog = await blogsRepository.findBlogByID(req.params.id)
+    if (!foundBlog) res.sendStatus(404)
+    res.status(200).send(foundBlog)
 })
 
 blogRouter.post('/',
     authorizationMiddleware,
     blogValidationMiddleware,
     inputValidationMiddleware,
-    (req: RequestWithBody<CreateBlogModel>,
-     res: Response<BlogViewModel>) => {
-   const newBlog = blogsRepository.createNewBlog(req.body)
-   if(!newBlog) res.sendStatus(400)
-       res.status(201).send(newBlog)
-})
+    async (req: RequestWithBody<CreateBlogModel>,
+           res: Response<BlogViewModel>) => {
+        const newBlog = await blogsRepository.createNewBlog(req.body)
+        if (!newBlog) res.sendStatus(400)
+        res.status(201).send(newBlog)
+    })
 
 blogRouter.put('/:id',
     authorizationMiddleware,
@@ -41,16 +40,16 @@ blogRouter.put('/:id',
     inputValidationMiddleware,
     (req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
      res: Response) => {
-    const isUpdate = blogsRepository.updateBlogByID(req.params.id, req.body)
-    if(!isUpdate) res.sendStatus(404)
-    res.sendStatus(204)
-})
+        const isUpdate = blogsRepository.updateBlogByID(req.params.id, req.body)
+        if (!isUpdate) res.sendStatus(404)
+        res.sendStatus(204)
+    })
 
 blogRouter.delete('/:id',
     authorizationMiddleware,
     (req: RequestWithParams<{ id: string }>,
      res: Response) => {
-    const isDeleted = blogsRepository.deleteBlogByID(req.params.id)
-    if(!isDeleted) res.sendStatus(404)
-    res.sendStatus(204)
-})
+        const isDeleted = blogsRepository.deleteBlogByID(req.params.id)
+        if (!isDeleted) res.sendStatus(404)
+        res.sendStatus(204)
+    })

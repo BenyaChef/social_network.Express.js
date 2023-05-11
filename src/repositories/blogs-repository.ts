@@ -4,26 +4,28 @@ import {createNewId} from "../utils/helpers/create-new-id";
 import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
 import {BlogModel} from "../models/blogs-models/BlogModel";
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
+import {client} from "./db";
+import {WithId} from "mongodb";
 
 
 export const blogsRepository = {
 
-    getAllBlogs(): BlogViewModel[] {
-        return blogsDB
+    async getAllBlogs(): Promise<BlogViewModel[]> {
+        return await client.db('blogs-and-posts').collection<BlogViewModel>('blogs').find({}, {projection: {_id: 0}}).toArray()
     },
 
-    findBlogByID(id: string): BlogViewModel | undefined{
-        return blogsDB.find(b => b.id === id)
+   async findBlogByID(id: string): Promise<BlogViewModel[]> {
+        return await client.db('blogs-and-posts').collection<BlogViewModel>('blogs').find({id: id}, {projection: {_id: 0}}).toArray()
     },
 
-    createNewBlog(body: CreateBlogModel): BlogViewModel {
+    async createNewBlog(body: CreateBlogModel): Promise<BlogViewModel> {
         const newBlog: CreateBlogModel = {
             id: createNewId(),
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl
         }
-        blogsDB.push(newBlog)
+        await client.db('blogs-and-posts').collection('blogs').insertOne(newBlog)
         return newBlog;
     },
 

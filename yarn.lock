@@ -2292,6 +2292,11 @@ minimatch@^3.0.4, minimatch@^3.1.1, minimatch@^3.1.2:
   dependencies:
     brace-expansion "^1.1.7"
 
+mogodb@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/mogodb/-/mogodb-0.0.1-security.tgz#c351c3379f49aae4f8522a76477e35e376bbf7d6"
+  integrity sha512-aRrvmRNhrmjOwPAhKI7pWiwHKna8U9BLpruj+dlwocwRrhJXoJ9CNThcVlphh7c4nQiPU0Wj6QsJYLUCS+7Glw==
+
 mongodb-connection-string-url@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/mongodb-connection-string-url/-/mongodb-connection-string-url-2.6.0.tgz#57901bf352372abdde812c81be47b75c6b2ec5cf"
