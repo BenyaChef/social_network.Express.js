@@ -1,8 +1,8 @@
-import {ObjectId} from "mongodb";
-
-export type BlogViewModel = {
+export interface BlogViewModel {
     id: string,
     name: string,
     description: string,
     websiteUrl: string
+    isMembership: boolean,
+    createdAt: string
 }

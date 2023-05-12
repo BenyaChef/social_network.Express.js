@@ -4,40 +4,52 @@ import {createNewId} from "../utils/helpers/create-new-id";
 import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
 import {BlogModel} from "../models/blogs-models/BlogModel";
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
-import {client} from "./db";
-import {WithId} from "mongodb";
-
+import {blogsCollections} from "./db";
+import {ObjectId, UpdateResult} from "mongodb";
+import {mapBlogs} from "../mapBlogs";
 
 export const blogsRepository = {
 
     async getAllBlogs(): Promise<BlogViewModel[]> {
-        return await client.db('blogs-and-posts').collection<BlogViewModel>('blogs').find({}, {projection: {_id: 0}}).toArray()
+        const arrBlogs = await blogsCollections.find({}).toArray()
+        return arrBlogs.map(blog => mapBlogs(blog))
     },
 
-   async findBlogByID(id: string): Promise<BlogViewModel[]> {
-        return await client.db('blogs-and-posts').collection<BlogViewModel>('blogs').find({id: id}, {projection: {_id: 0}}).toArray()
+    async findBlogByID(id: string): Promise<BlogViewModel | boolean> {
+
+            const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
+            if (!isFind) return false
+            return mapBlogs(isFind);
+
+
     },
 
     async createNewBlog(body: CreateBlogModel): Promise<BlogViewModel> {
         const newBlog: CreateBlogModel = {
-            id: createNewId(),
+            _id: new ObjectId,
             name: body.name,
             description: body.description,
-            websiteUrl: body.websiteUrl
+            websiteUrl: body.websiteUrl,
+            isMembership: false,
+            createdAt: new Date().toISOString()
+
         }
-        await client.db('blogs-and-posts').collection('blogs').insertOne(newBlog)
-        return newBlog;
+        await blogsCollections.insertOne(newBlog)
+        return mapBlogs(newBlog)
     },
 
-    updateBlogByID(id: string, body: UpdateBlogModel): boolean {
-        const foundBlog: BlogModel | undefined = blogsDB.find(b => b.id === id)
-        if (foundBlog) {
-            foundBlog.name = body.name
-            foundBlog.description = body.description
-            foundBlog.websiteUrl = body.websiteUrl
-            return true;
-        }
-        return false;
+    async updateBlogByID(id: string, body: UpdateBlogModel): Promise<boolean> {
+
+            const isFind: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)},
+                {
+                    $set: {
+                        name: body.name,
+                        description: body.description,
+                        websiteUrl: body.websiteUrl
+                    }
+                })
+            return isFind.matchedCount === 1;
+
     },
 
     deleteBlogByID(id: string): boolean {

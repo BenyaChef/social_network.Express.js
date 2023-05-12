@@ -1,19 +1,23 @@
-import {MongoClient, ServerApiVersion} from "mongodb";
+import {MongoClient} from "mongodb";
+import dotenv from "dotenv";
+import {BlogModel} from "../models/blogs-models/BlogModel";
+dotenv.config()
 
-const mongoURI = process.env.MONGO_URL || "mongodb+srv://benyaChef:qwerty12345@cluster0.i46rvtu.mongodb.net/?retryWrites=true&w=majority"
+const mongoURI = process.env.MONGO_URL
 
-export const client = new MongoClient(mongoURI, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-})
+if(!mongoURI) {
+    throw new Error('mongoUri not found')
+}
+
+const client = new MongoClient(mongoURI)
+const DB = client.db('blogs-and-posts')
+export const blogsCollections = DB.collection<BlogModel>('blogs')
+export const postsCollections = DB.collection('posts')
 
 export async function runDB() {
     try {
         await client.connect();
-        await client.db('blogs-and-posts').command({ping: 1})
+        await DB.command({ping: 1})
         console.log('Connected successfully to mongo server')
     } catch {
         console.log("Can`t connect to db")

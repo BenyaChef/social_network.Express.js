@@ -7,7 +7,6 @@ import {runDB} from "./repositories/db";
 
 dotenv.config()
 
-
 export const app = express()
 const port = process.env.PORT || 3003
 
