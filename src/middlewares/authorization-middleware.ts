@@ -4,7 +4,7 @@ export const authorizationMiddleware = async (req: Request, res: Response, next:
     const basic64 = Buffer.from('admin:qwerty').toString('base64')
     const loginData = `Basic ${basic64}`
 
-    if(req.headers.authorization !== loginData) await res.sendStatus(401)
+    if(req.headers.authorization !== loginData) res.sendStatus(401)
 
-    next()
+   await next()
 }
