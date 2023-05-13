@@ -11,7 +11,7 @@ if(!mongoURI) {
 }
 
 const client = new MongoClient(mongoURI)
-const DB = client.db('blogs-and-posts')
+const DB = client.db()
 export const blogsCollections = DB.collection<BlogModel>('blogs')
 export const postsCollections = DB.collection<PostModel>('posts')
 
