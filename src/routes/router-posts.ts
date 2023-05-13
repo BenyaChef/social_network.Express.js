@@ -10,7 +10,6 @@ import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 
-
 export const postRouter = Router({})
 
 postRouter.get('/', async (req: Request,
