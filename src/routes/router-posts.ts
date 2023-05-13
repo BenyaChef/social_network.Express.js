@@ -7,44 +7,54 @@ import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../models/request-models/RequestTypes";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
+import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
+import {idInputMiddleware} from "../middlewares/id-input-middleware";
 
 
 export const postRouter = Router({})
 
-postRouter.get('/', (req: Request,
-                     res: Response<PostViewModel[]>) => {
-    res.status(200).send(postsRepository.getAllPost())
+postRouter.get('/', async (req: Request,
+                           res: Response<PostViewModel[]>) => {
+    res.status(200).send(await postsRepository.getAllPost())
 })
-postRouter.get('/:id', (req: RequestWithParams<{ id: string }>,
-                        res: Response<PostViewModel>) => {
-    const isFind = postsRepository.findPostByID(req.params.id)
-    if (!isFind) res.sendStatus(404)
-        res.status(200).send(isFind)
-})
+postRouter.get('/:id',
+    idValidationMiddleware,
+    idInputMiddleware,
+    async (req: RequestWithParams<{ id: string }>,
+           res: Response<PostViewModel | boolean>) => {
+        const isFind = await postsRepository.findPostByID(req.params.id)
+        if (!isFind) return res.sendStatus(404)
+        return res.status(200).send(isFind)
+    })
 postRouter.post('/',
     authorizationMiddleware,
     postValidationMiddleware,
     inputValidationMiddleware,
-    (req: RequestWithBody<CreatePostModel>,
-     res: Response<PostViewModel>) => {
-    const newPost = postsRepository.createNewPost(req.body)
-    if(!newPost) res.sendStatus(400)
-    res.status(201).send(newPost)
-})
+    async (req: RequestWithBody<CreatePostModel>,
+           res: Response<PostViewModel | boolean>) => {
+        const newPost = await postsRepository.createNewPost(req.body)
+        if (!newPost) return res.sendStatus(400)
+        return res.status(201).send(newPost)
+    })
 postRouter.put('/:id',
     authorizationMiddleware,
+    idValidationMiddleware,
+    idInputMiddleware,
     postValidationMiddleware,
     inputValidationMiddleware,
-    (req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
-     res: Response) => {
-    const isUpdate = postsRepository.updatePostByID(req.params.id, req.body)
-    if(!isUpdate) res.sendStatus(404)
-    res.sendStatus(204)
-})
-postRouter.delete('/:id', authorizationMiddleware,
-    (req: RequestWithParams<{ id: string }>,
-     res: Response) => {
-    const isDelete = postsRepository.deletePostByID(req.params.id)
-    if(!isDelete) res.sendStatus(404)
-    res.sendStatus(204)
-})
+    async (req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
+           res: Response) => {
+        const isUpdate = await postsRepository.updatePostByID(req.params.id, req.body)
+        if (!isUpdate) return res.sendStatus(404)
+        return res.sendStatus(204)
+    })
+postRouter.delete('/:id',
+    authorizationMiddleware,
+    idValidationMiddleware,
+    idInputMiddleware,
+    async (req: RequestWithParams<{ id: string }>,
+           res: Response) => {
+        const isDelete = await postsRepository.deletePostByID(req.params.id)
+        if (!isDelete) return res.sendStatus(404)
+        return res.sendStatus(204)
+    })

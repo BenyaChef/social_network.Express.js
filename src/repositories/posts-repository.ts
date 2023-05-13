@@ -1,53 +1,60 @@
 import {postDB} from "../db/postDB";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
-import {createNewId} from "../utils/helpers/create-new-id";
-import {findBlogID} from "../utils/helpers/find-blogID";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostModel} from "../models/posts-models/PostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
+import {blogsCollections, postsCollections} from "./db";
+import {mapPosts} from "../mapPosts";
+import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
+import {findBlogID} from "../utils/helpers/find-blogID";
 
 export const postsRepository = {
 
-    getAllPost(): PostViewModel[] {
-        return postDB
+    async getAllPost(): Promise<PostViewModel[]> {
+        const postsArr: PostModel[] = await postsCollections.find({}).toArray()
+        return postsArr.map(post => mapPosts(post))
     },
 
-    findPostByID(id: string): PostViewModel | undefined{
-        return postDB.find(p => p.id === id)
+    async findPostByID(id: string): Promise<PostViewModel | boolean> {
+        const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
+        if (!isFind) return false
+        return mapPosts(isFind)
     },
 
-    createNewPost(body: CreatePostModel): PostViewModel {
-        const newPost: PostModel = {
-            id: createNewId(),
+    async createNewPost(body: CreatePostModel): Promise<PostViewModel | boolean> {
+        const newPost: CreatePostModel = {
+            _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: findBlogID(body.blogId)
+            blogName: await findBlogID(body.blogId),
+            createdAt: new Date().toISOString()
         }
-        postDB.push(newPost)
-        return newPost
+        await postsCollections.insertOne(newPost)
+        return mapPosts(newPost)
     },
 
-    updatePostByID(id: string, body: UpdatePostModel): boolean {
-        const findPost: PostModel | undefined = postDB.find(p => p.id === id)
-        if(findPost) {
-            findPost.title = body.title
-            findPost.shortDescription = body.shortDescription
-            findPost.content = body.content
-            findPost.blogId = body.blogId
-            findPost.blogName = findBlogID(body.blogId)
-            return true;
-        }
-        return false;
+    async updatePostByID(id: string, body: UpdatePostModel): Promise<boolean> {
+        const findPost: UpdateResult<PostModel> = await postsCollections.updateOne({_id: new ObjectId(id)},
+            {
+                $set:
+                    {
+                        title: body.title,
+                        shortDescription: body.shortDescription,
+                        content: body.content,
+                        blogId: body.blogId,
+                        blogName: await findBlogID(body.blogId)
+                    }
+            })
+        return findPost.matchedCount === 1
     },
 
-    deletePostByID(id: string): boolean {
-        for (let i = 0; i < postDB.length; i++) {
-            if (postDB[i].id === id) {
-                postDB.splice(i, 1)
-                return true
-            }
+    async deletePostByID(id: string): Promise<boolean> {
+        const isDelete: DeleteResult = await postsCollections.deleteOne({_id: new ObjectId(id)})
+        if (isDelete.deletedCount === 1) {
+            const isFind = await blogsCollections.findOne({_id: new ObjectId(id)})
+            if (!isFind) return true
         }
         return false
     }

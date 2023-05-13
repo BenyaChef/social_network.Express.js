@@ -1,6 +1,8 @@
-import {blogsDB} from "../../db/blogsDB";
+import {blogsCollections} from "../../repositories/db";
+import {ObjectId} from "mongodb";
 
-export const findBlogID = (blog: string) => {
-    const findBlog = blogsDB.find(e => e.id === blog)
+export const findBlogID = async (blog: string) => {
+    const findBlog = await blogsCollections.findOne({_id: new ObjectId(blog)})
     return findBlog?.name
+
 }

@@ -7,7 +7,7 @@ import {BlogViewModel} from "../models/blogs-models/BlogViewModel";
 import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../models/request-models/RequestTypes";
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
-import {idValidationMiddleware} from "../middlewares/idValidationMiddleware";
+import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 
 
@@ -18,12 +18,15 @@ blogRouter.get('/', async (req: Request,
     res.status(200).send(await blogsRepository.getAllBlogs())
 })
 
-blogRouter.get('/:id', idValidationMiddleware, idInputMiddleware, async (req: RequestWithParams<{ id: string }>,
-                                                                                 res: Response<BlogViewModel | boolean>) => {
-    const foundBlog: BlogViewModel | boolean = await blogsRepository.findBlogByID(req.params.id)
-    if (!foundBlog) return res.sendStatus(404)
-    return res.status(200).send(foundBlog)
-})
+blogRouter.get('/:id',
+    idValidationMiddleware,
+    idInputMiddleware,
+    async (req: RequestWithParams<{ id: string }>,
+           res: Response<BlogViewModel | boolean>) => {
+        const foundBlog: BlogViewModel | boolean = await blogsRepository.findBlogByID(req.params.id)
+        if (!foundBlog) return res.sendStatus(404)
+        return res.status(200).send(foundBlog)
+    })
 
 blogRouter.post('/',
     authorizationMiddleware,
@@ -31,7 +34,7 @@ blogRouter.post('/',
     inputValidationMiddleware,
     async (req: RequestWithBody<CreateBlogModel>,
            res: Response<BlogViewModel>) => {
-        const newBlog: BlogViewModel = await blogsRepository.createNewBlog(req.body)
+        const newBlog: BlogViewModel | undefined = await blogsRepository.createNewBlog(req.body)
         if (!newBlog) res.sendStatus(400)
         res.status(201).send(newBlog)
     })
@@ -51,9 +54,11 @@ blogRouter.put('/:id',
 
 blogRouter.delete('/:id',
     authorizationMiddleware,
-    (req: RequestWithParams<{ id: string }>,
+    idValidationMiddleware,
+    idInputMiddleware,
+   async (req: RequestWithParams<{ id: string }>,
      res: Response) => {
-        const isDeleted = blogsRepository.deleteBlogByID(req.params.id)
-        if (!isDeleted) res.sendStatus(404)
-        res.sendStatus(204)
+        const isDeleted = await blogsRepository.deleteBlogByID(req.params.id)
+        if (!isDeleted) return  res.sendStatus(404)
+        return  res.sendStatus(204)
     })
