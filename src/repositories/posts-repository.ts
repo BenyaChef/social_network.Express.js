@@ -1,4 +1,3 @@
-import {postDB} from "../db/postDB";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostModel} from "../models/posts-models/PostModel";
