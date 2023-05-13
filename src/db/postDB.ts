@@ -1,10 +1,10 @@
-import {PostModel} from "../models/posts-models/PostModel";
-
-export const postDB: PostModel[] = [{
-    "id": "1",
-    "title": "like",
-    "shortDescription": "this is like",
-    "content": "this is like for my",
-    "blogId": "1",
-    "blogName": "Blog for kitchen"
-}]
+// import {PostModel} from "../models/posts-models/PostModel";
+//
+// export const postDB: PostModel[] = [{
+//     "id": "1",
+//     "title": "like",
+//     "shortDescription": "this is like",
+//     "content": "this is like for my",
+//     "blogId": "1",
+//     "blogName": "Blog for kitchen"
+// }]
