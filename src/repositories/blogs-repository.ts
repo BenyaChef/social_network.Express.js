@@ -50,10 +50,6 @@ export const blogsRepository = {
 
     async deleteBlogByID(id: string): Promise<boolean> {
         const isDelete: DeleteResult = await blogsCollections.deleteOne({_id: new ObjectId(id)})
-        if (isDelete.deletedCount === 1) {
-            const isFind = await blogsCollections.findOne({_id: new ObjectId(id)})
-            if (!isFind) return true
-        }
-        return false
+        return isDelete.deletedCount === 1
     }
 }
