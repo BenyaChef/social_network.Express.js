@@ -61,12 +61,7 @@ exports.postsRepository = {
     deletePostByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const isDelete = yield db_1.postsCollections.deleteOne({ _id: new mongodb_1.ObjectId(id) });
-            if (isDelete.deletedCount === 1) {
-                const isFind = yield db_1.blogsCollections.findOne({ _id: new mongodb_1.ObjectId(id) });
-                if (!isFind)
-                    return true;
-            }
-            return false;
+            return isDelete.deletedCount === 1;
         });
     }
 };
