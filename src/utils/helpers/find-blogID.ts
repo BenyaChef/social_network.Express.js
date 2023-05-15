@@ -1,4 +1,4 @@
-import {blogsCollections} from "../../repositories/db";
+import {blogsCollections} from "../../db/db";
 import {ObjectId} from "mongodb";
 
 export const findBlogID = async (blog: string) => {

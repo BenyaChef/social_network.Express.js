@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {blogsCollections, postsCollections} from "../repositories/db";
+import {blogsCollections, postsCollections} from "../db/db";
 
 
 export const testRouter = Router({})

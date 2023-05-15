@@ -3,7 +3,7 @@ import {blogRouter} from "./routes/router-blogs";
 import {postRouter} from "./routes/router-posts";
 import {testRouter} from "./routes/router-testing";
 import dotenv from 'dotenv'
-import {runDB} from "./repositories/db";
+import {runDB} from "./db/db";
 
 dotenv.config()
 

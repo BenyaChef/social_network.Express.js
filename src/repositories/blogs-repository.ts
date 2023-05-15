@@ -2,7 +2,7 @@ import {BlogViewModel} from "../models/blogs-models/BlogViewModel";
 import {CreateBlogModel} from "../models/blogs-models/CreateBlogModel";
 import {BlogModel} from "../models/blogs-models/BlogModel";
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
-import {blogsCollections} from "./db";
+import {blogsCollections} from "../db/db";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 import {mapBlogs} from "../mapBlogs";
 
