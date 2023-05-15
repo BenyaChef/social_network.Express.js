@@ -11,6 +11,7 @@ export const blogsRepository = {
     async getAllBlogs(): Promise<BlogViewModel[]> {
         const arrBlogs: BlogModel[] = await blogsCollections.find({}).toArray()
         return arrBlogs.map(blog => mapBlogs(blog))
+
     },
 
     async findBlogByID(id: string): Promise<BlogViewModel | boolean> {
