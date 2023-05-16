@@ -9,12 +9,13 @@ import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
+import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
 export const postRouter = Router({})
 
 postRouter.get('/', async (req: Request,
                            res: Response<PostViewModel[]>) => {
-    res.status(200).send(await postsRepository.getAllPost())
+    res.status(HTTP_STATUS.OK).send(await postsRepository.getAllPost())
 })
 postRouter.get('/:id',
     idValidationMiddleware,
@@ -22,8 +23,8 @@ postRouter.get('/:id',
     async (req: RequestWithParams<{ id: string }>,
            res: Response<PostViewModel | boolean>) => {
         const isFind = await postsRepository.findPostByID(req.params.id)
-        if (!isFind) return res.sendStatus(404)
-        return res.status(200).send(isFind)
+        if (!isFind) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.status(HTTP_STATUS.OK).send(isFind)
     })
 postRouter.post('/',
     authorizationMiddleware,
@@ -32,8 +33,8 @@ postRouter.post('/',
     async (req: RequestWithBody<CreatePostModel>,
            res: Response<PostViewModel | boolean>) => {
         const newPost = await postsRepository.createNewPost(req.body)
-        if (!newPost) return res.sendStatus(400)
-        return res.status(201).send(newPost)
+        if (!newPost) return res.sendStatus(HTTP_STATUS.Bad_request)
+        return res.status(HTTP_STATUS.Created).send(newPost)
     })
 postRouter.put('/:id',
     authorizationMiddleware,
@@ -44,8 +45,8 @@ postRouter.put('/:id',
     async (req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
            res: Response) => {
         const isUpdate = await postsRepository.updatePostByID(req.params.id, req.body)
-        if (!isUpdate) return res.sendStatus(404)
-        return res.sendStatus(204)
+        if (!isUpdate) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.sendStatus(HTTP_STATUS.No_content)
     })
 postRouter.delete('/:id',
     authorizationMiddleware,
@@ -54,6 +55,6 @@ postRouter.delete('/:id',
     async (req: RequestWithParams<{ id: string }>,
            res: Response) => {
         const isDelete = await postsRepository.deletePostByID(req.params.id)
-        if (!isDelete) return res.sendStatus(404)
-        return res.sendStatus(204)
+        if (!isDelete) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.sendStatus(HTTP_STATUS.No_content)
     })

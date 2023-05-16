@@ -1,5 +1,5 @@
-import {BlogModel} from "./models/blogs-models/BlogModel";
-import {BlogViewModel} from "./models/blogs-models/BlogViewModel";
+import {BlogModel} from "../../models/blogs-models/BlogModel";
+import {BlogViewModel} from "../../models/blogs-models/BlogViewModel";
 
 
 export function mapBlogs(blog: BlogModel): BlogViewModel {

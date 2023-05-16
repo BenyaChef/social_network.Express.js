@@ -4,7 +4,7 @@ import {BlogModel} from "../models/blogs-models/BlogModel";
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
 import {blogsCollections} from "../db/db";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
-import {mapBlogs} from "../mapBlogs";
+import {mapBlogs} from "../utils/helpers/map-blogs";
 
 export const blogsRepository = {
 
@@ -37,15 +37,12 @@ export const blogsRepository = {
     },
 
     async updateBlogByID(id: string, body: UpdateBlogModel): Promise<boolean> {
-
-        const isFind: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)},
-            {
-                $set: {
-                    name: body.name,
-                    description: body.description,
-                    websiteUrl: body.websiteUrl
-                }
-            })
+    const updateBlog: UpdateBlogModel = {
+        name: body.name,
+        description: body.description,
+        websiteUrl: body.websiteUrl
+    }
+        const isFind: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)}, {$set: updateBlog})
         return isFind.matchedCount === 1;
     },
 

@@ -9,13 +9,14 @@ import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../m
 import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
+import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
 
 export const blogRouter = Router({})
 
 blogRouter.get('/', async (req: Request,
                            res: Response<BlogViewModel[]>) => {
-    res.status(200).send(await blogsRepository.getAllBlogs())
+    res.status(HTTP_STATUS.OK).send(await blogsRepository.getAllBlogs())
 })
 
 blogRouter.get('/:id',
@@ -24,8 +25,8 @@ blogRouter.get('/:id',
     async (req: RequestWithParams<{ id: string }>,
            res: Response<BlogViewModel | boolean>) => {
         const foundBlog: BlogViewModel | boolean = await blogsRepository.findBlogByID(req.params.id)
-        if (!foundBlog) return res.sendStatus(404)
-        return res.status(200).send(foundBlog)
+        if (!foundBlog) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.status(HTTP_STATUS.OK).send(foundBlog)
     })
 
 blogRouter.post('/',
@@ -35,8 +36,8 @@ blogRouter.post('/',
     async (req: RequestWithBody<CreateBlogModel>,
            res: Response<BlogViewModel>) => {
         const newBlog: BlogViewModel | undefined = await blogsRepository.createNewBlog(req.body)
-        if (!newBlog) res.sendStatus(400)
-        res.status(201).send(newBlog)
+        if (!newBlog) res.sendStatus(HTTP_STATUS.Bad_request)
+        res.status(HTTP_STATUS.Created).send(newBlog)
     })
 
 blogRouter.put('/:id',
@@ -48,8 +49,8 @@ blogRouter.put('/:id',
     async (req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
            res: Response) => {
         const isUpdate = await blogsRepository.updateBlogByID(req.params.id, req.body)
-        if (!isUpdate) return res.sendStatus(404)
-        return res.sendStatus(204)
+        if (!isUpdate) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.sendStatus(HTTP_STATUS.No_content)
     })
 
 blogRouter.delete('/:id',
@@ -59,6 +60,6 @@ blogRouter.delete('/:id',
    async (req: RequestWithParams<{ id: string }>,
      res: Response) => {
         const isDeleted = await blogsRepository.deleteBlogByID(req.params.id)
-        if (!isDeleted) return  res.sendStatus(404)
-        return  res.sendStatus(204)
+        if (!isDeleted) return  res.sendStatus(HTTP_STATUS.Not_found)
+        return  res.sendStatus(HTTP_STATUS.No_content)
     })

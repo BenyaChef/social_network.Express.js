@@ -1,5 +1,5 @@
-import {PostModel} from "./models/posts-models/PostModel";
-import {PostViewModel} from "./models/posts-models/PostViewModel";
+import {PostModel} from "../../models/posts-models/PostModel";
+import {PostViewModel} from "../../models/posts-models/PostViewModel";
 
 export function mapPosts(post: PostModel) : PostViewModel {
     return {

@@ -2,8 +2,8 @@ import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostModel} from "../models/posts-models/PostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
-import {blogsCollections, postsCollections} from "../db/db";
-import {mapPosts} from "../mapPosts";
+import {postsCollections} from "../db/db";
+import {mapPosts} from "../utils/helpers/map-posts";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 import {findBlogID} from "../utils/helpers/find-blogID";
 
