@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {blogsRepository} from "../repositories/blogs-repository";
+import {blogsService} from "../domain/blogs-service";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {blogValidationMiddleware} from "../middlewares/blog-validation-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
@@ -10,21 +10,19 @@ import {UpdateBlogModel} from "../models/blogs-models/UpdateBlogModel";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
+import {blogsController} from "../controller/blogs-controller";
 
 
 export const blogRouter = Router({})
 
-blogRouter.get('/', async (req: Request,
-                           res: Response<BlogViewModel[]>) => {
-    res.status(HTTP_STATUS.OK).send(await blogsRepository.getAllBlogs())
-})
+blogRouter.get('/', blogsController.getAllBlogs)
 
 blogRouter.get('/:id',
     idValidationMiddleware,
     idInputMiddleware,
     async (req: RequestWithParams<{ id: string }>,
            res: Response<BlogViewModel | boolean>) => {
-        const foundBlog: BlogViewModel | boolean = await blogsRepository.findBlogByID(req.params.id)
+        const foundBlog: BlogViewModel | boolean = await blogsService.findBlogByID(req.params.id)
         if (!foundBlog) return res.sendStatus(HTTP_STATUS.Not_found)
         return res.status(HTTP_STATUS.OK).send(foundBlog)
     })
@@ -35,9 +33,9 @@ blogRouter.post('/',
     inputValidationMiddleware,
     async (req: RequestWithBody<CreateBlogModel>,
            res: Response<BlogViewModel>) => {
-        const newBlog: BlogViewModel | undefined = await blogsRepository.createNewBlog(req.body)
-        if (!newBlog) res.sendStatus(HTTP_STATUS.Bad_request)
-        res.status(HTTP_STATUS.Created).send(newBlog)
+        const newBlog: BlogViewModel | undefined = await blogsService.createNewBlog(req.body)
+        if (!newBlog) return res.sendStatus(HTTP_STATUS.Bad_request)
+        return res.status(HTTP_STATUS.Created).send(newBlog)
     })
 
 blogRouter.put('/:id',
@@ -48,7 +46,7 @@ blogRouter.put('/:id',
     inputValidationMiddleware,
     async (req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
            res: Response) => {
-        const isUpdate = await blogsRepository.updateBlogByID(req.params.id, req.body)
+        const isUpdate = await blogsService.updateBlogByID(req.params.id, req.body)
         if (!isUpdate) return res.sendStatus(HTTP_STATUS.Not_found)
         return res.sendStatus(HTTP_STATUS.No_content)
     })
@@ -57,9 +55,9 @@ blogRouter.delete('/:id',
     authorizationMiddleware,
     idValidationMiddleware,
     idInputMiddleware,
-   async (req: RequestWithParams<{ id: string }>,
-     res: Response) => {
-        const isDeleted = await blogsRepository.deleteBlogByID(req.params.id)
-        if (!isDeleted) return  res.sendStatus(HTTP_STATUS.Not_found)
-        return  res.sendStatus(HTTP_STATUS.No_content)
+    async (req: RequestWithParams<{ id: string }>,
+           res: Response) => {
+        const isDeleted = await blogsService.deleteBlogByID(req.params.id)
+        if (!isDeleted) return res.sendStatus(HTTP_STATUS.Not_found)
+        return res.sendStatus(HTTP_STATUS.No_content)
     })

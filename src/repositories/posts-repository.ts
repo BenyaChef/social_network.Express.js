@@ -5,7 +5,7 @@ import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {postsCollections} from "../db/db";
 import {mapPosts} from "../utils/helpers/map-posts";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
-import {findBlogID} from "../utils/helpers/find-blogID";
+
 
 export const postsRepository = {
 
@@ -20,38 +20,18 @@ export const postsRepository = {
         return mapPosts(isFind)
     },
 
-    async createNewPost(body: CreatePostModel): Promise<PostViewModel | boolean> {
-        const newPost: CreatePostModel = {
-            _id: new ObjectId(),
-            title: body.title,
-            shortDescription: body.shortDescription,
-            content: body.content,
-            blogId: body.blogId,
-            blogName: await findBlogID(body.blogId),
-            createdAt: new Date().toISOString()
-        }
+    async createNewPost(newPost: CreatePostModel): Promise<PostViewModel | boolean> {
         await postsCollections.insertOne(newPost)
         return mapPosts(newPost)
     },
 
-    async updatePostByID(id: string, body: UpdatePostModel): Promise<boolean> {
-        const findPost: UpdateResult<PostModel> = await postsCollections.updateOne({_id: new ObjectId(id)},
-            {
-                $set:
-                    {
-                        title: body.title,
-                        shortDescription: body.shortDescription,
-                        content: body.content,
-                        blogId: body.blogId,
-                        blogName: await findBlogID(body.blogId)
-                    }
-            })
+    async updatePostByID(id: string, updatePost: UpdatePostModel): Promise<boolean> {
+        const findPost: UpdateResult<PostModel> = await postsCollections.updateOne({_id: new ObjectId(id)}, {$set: updatePost})
         return findPost.matchedCount === 1
     },
 
     async deletePostByID(id: string): Promise<boolean> {
         const isDelete: DeleteResult = await postsCollections.deleteOne({_id: new ObjectId(id)})
         return isDelete.deletedCount === 1
-
     }
 }

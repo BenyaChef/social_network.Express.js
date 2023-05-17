@@ -18,30 +18,14 @@ export const blogsRepository = {
         const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
         if (!isFind) return false
         return mapBlogs(isFind);
-
-
     },
 
-    async createNewBlog(body: CreateBlogModel): Promise<BlogViewModel> {
-        const newBlog: CreateBlogModel = {
-            _id: new ObjectId,
-            name: body.name,
-            description: body.description,
-            websiteUrl: body.websiteUrl,
-            isMembership: false,
-            createdAt: new Date().toISOString()
-
-        }
+    async createNewBlog(newBlog: CreateBlogModel): Promise<BlogViewModel> {
         await blogsCollections.insertOne(newBlog)
         return mapBlogs(newBlog)
     },
 
-    async updateBlogByID(id: string, body: UpdateBlogModel): Promise<boolean> {
-    const updateBlog: UpdateBlogModel = {
-        name: body.name,
-        description: body.description,
-        websiteUrl: body.websiteUrl
-    }
+    async updateBlogByID(id: string, updateBlog: UpdateBlogModel): Promise<boolean> {
         const isFind: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)}, {$set: updateBlog})
         return isFind.matchedCount === 1;
     },

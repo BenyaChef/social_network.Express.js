@@ -10,12 +10,13 @@ import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
+import {postsService} from "../domain/posts-service";
 
 export const postRouter = Router({})
 
 postRouter.get('/', async (req: Request,
                            res: Response<PostViewModel[]>) => {
-    res.status(HTTP_STATUS.OK).send(await postsRepository.getAllPost())
+    res.status(HTTP_STATUS.OK).send(await postsService.getAllPost())
 })
 postRouter.get('/:id',
     idValidationMiddleware,
