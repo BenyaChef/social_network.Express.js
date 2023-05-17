@@ -8,7 +8,7 @@ export const testRouter = Router({})
 testRouter.delete('/all-data', async (req: Request, res: Response) => {
     const isDelete = await Promise.all([blogsCollections.deleteMany({}), postsCollections.deleteMany({})])
     if (isDelete) {
-        res.sendStatus(HTTP_STATUS.No_content)
+        return res.sendStatus(HTTP_STATUS.No_content)
     }
-    res.sendStatus(HTTP_STATUS.Not_found)
+    return res.sendStatus(HTTP_STATUS.Not_found)
 })
