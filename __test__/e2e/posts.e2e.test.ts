@@ -1,5 +1,5 @@
 import request from "supertest";
-import {app} from "../../src";
+import {app} from "../../src/setting";
 
 describe('/posts', () => {
     beforeAll(async () => {
