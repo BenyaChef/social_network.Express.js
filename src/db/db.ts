@@ -1,6 +1,6 @@
 import {MongoClient} from "mongodb";
 import dotenv from "dotenv";
-import {BlogModel} from "../models/blogs-models/BlogModel";
+import {BlogModel} from "../models/blogs-models/blog-model";
 import {PostModel} from "../models/posts-models/PostModel";
 dotenv.config()
 
