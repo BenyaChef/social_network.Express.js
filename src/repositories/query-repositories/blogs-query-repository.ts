@@ -1,29 +1,50 @@
-import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
 import {BlogModel} from "../../models/blogs-models/blog-model";
 import {blogsCollections} from "../../db/db";
 import {mapBlogs} from "../../utils/helpers/map-blogs";
-import {ObjectId} from "mongodb";
-import {PaginationSortQueryModel} from "../../models/request-models/pagination-sort-query-model";
+import {BlogsPaginationSortQueryModel} from "../../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../../models/blogs-models/blogs-view-sort-pagin-model";
+import {SortDirectionEnum} from "../../enum/sort-direction";
+
 
 export const blogsQueryRepository = {
 
-    async getAllBlogs(query: PaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
-        const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = query
+    async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
 
-        const arrBlogs: BlogModel[] = await blogsCollections.find({}).toArray()
+        const queryResult = await this._paginationAndSortToQueryParam(query)
+
+        const arrBlogs: BlogModel[] = await blogsCollections
+            .find({name: {$regex: queryResult.searchNameTerm}})
+            .sort({[queryResult.sortBy]: queryResult.sortDirection})
+            .limit(+queryResult.pageSize)
+            .skip(queryResult.skipPage)
+            .toArray()
         return {
-            pagesCount: 1,
-            page: 1,
-            pageSize: 2,
-            totalCount: 3,
+            pagesCount: queryResult.pagesCount,
+            page: +queryResult.pageNumber,
+            pageSize: +queryResult.pageSize,
+            totalCount: queryResult.totalCount,
             items: arrBlogs.map(blog => mapBlogs(blog))
         }
     },
 
-    async findBlogByID(id: string | ObjectId): Promise<BlogViewModel | boolean> {
-        const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
-        if (!isFind) return false
-        return mapBlogs(isFind);
-    }
+    _paginationAndSortToQueryParam: async (query: BlogsPaginationSortQueryModel) => {
+        const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = query
+        const paramSortPagination: BlogsPaginationSortQueryModel = {
+            searchNameTerm: searchNameTerm || null,
+            sortBy: sortBy || 'createdAt',
+            sortDirection: sortDirection || SortDirectionEnum.desc,
+            pageNumber: pageNumber || 1,
+            pageSize: pageSize || 10
+        }
+        const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
+        const totalCount = await blogsCollections.countDocuments({name: {$regex: searchNameTerm}})
+        const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
+        return {
+            ...paramSortPagination,
+            skipPage,
+            totalCount,
+            pagesCount
+        }
+
+    },
 }

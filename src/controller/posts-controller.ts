@@ -2,15 +2,23 @@ import {Request, Response} from "express";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {postsService} from "../domain/posts-service";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../models/request-models/RequestTypes";
+import {
+    RequestWithBody,
+    RequestWithParams,
+    RequestWithParamsAndBody,
+    RequestWithQuery
+} from "../models/request-models/RequestTypes";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
+import {BlogsPaginationSortQueryModel} from "../models/request-models/blogs-pagination-sort-query-model";
+import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
+import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-sort-pagin-model";
 
 export const postsController = {
 
-    async getAllPost(req: Request,
-                     res: Response<PostViewModel[]>) {
-        res.status(HTTP_STATUS.OK).send(await postsService.getAllPost())
+    async getAllPost(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
+                     res: Response<PostsViewSortPaginationModel>) {
+        res.status(HTTP_STATUS.OK).send(await postsQueryRepository.getAllPost(req.query))
     },
 
     async getPostById(req: RequestWithParams<{ id: string }>,

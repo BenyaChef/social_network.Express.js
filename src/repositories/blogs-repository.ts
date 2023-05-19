@@ -8,9 +8,15 @@ import {mapBlogs} from "../utils/helpers/map-blogs";
 
 export const blogsRepository = {
 
-    async createNewBlog(newBlog: CreateBlogModel): Promise<ObjectId> {
+    async findBlogByID(id: string): Promise<BlogViewModel | boolean> {
+        const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
+        if (!isFind) return false
+        return mapBlogs(isFind);
+    },
+
+    async createNewBlog(newBlog: CreateBlogModel): Promise<BlogViewModel> {
         await blogsCollections.insertOne(newBlog)
-        return newBlog._id
+        return mapBlogs(newBlog)
     },
 
     async updateBlogByID(id: string, updateBlog: UpdateBlogModel): Promise<boolean> {

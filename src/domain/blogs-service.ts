@@ -7,7 +7,11 @@ import {blogsRepository} from "../repositories/blogs-repository";
 
 export const blogsService = {
 
-    async createNewBlog(body: CreateBlogModel): Promise<ObjectId> {
+    async findBlogByID(id: string): Promise<BlogViewModel | boolean> {
+        return await blogsRepository.findBlogByID(id)
+    },
+
+    async createNewBlog(body: CreateBlogModel): Promise<BlogViewModel> {
         const newBlog: CreateBlogModel = {
             _id: new ObjectId,
             name: body.name,

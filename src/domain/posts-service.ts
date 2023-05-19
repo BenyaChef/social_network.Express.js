@@ -7,10 +7,6 @@ import {postsRepository} from "../repositories/posts-repository";
 
 export const postsService = {
 
-    async getAllPost(): Promise<PostViewModel[]> {
-        return await postsRepository.getAllPost()
-    },
-
     async findPostByID(id: string): Promise<PostViewModel | boolean> {
         return await postsRepository.findPostByID(id)
     },
@@ -26,6 +22,19 @@ export const postsService = {
             createdAt: new Date().toISOString()
         }
         return await postsRepository.createNewPost(newPost)
+    },
+
+    async createNewPostForBlog(blogId: string ,body: CreatePostModel) : Promise<PostViewModel> {
+        const newPostForBlog: CreatePostModel = {
+            _id: new ObjectId(),
+            title: body.title,
+            shortDescription: body.shortDescription,
+            content: body.content,
+            blogId: blogId,
+            blogName: await findBlogID(blogId),
+            createdAt: new Date().toISOString()
+        }
+        return await postsRepository.createNewPost(newPostForBlog)
     },
 
     async updatePostByID(id: string, body: UpdatePostModel): Promise<boolean> {
