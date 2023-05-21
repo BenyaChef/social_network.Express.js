@@ -5,11 +5,8 @@ import {inputValidationMiddleware} from "../middlewares/input-validation-middlew
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 import {blogsController} from "../controller/blogs-controller";
-import {postValidationMiddleware} from "../middlewares/post-validation-middleware";
+import {postQueryValidationMiddleware} from "../middlewares/post-query-validation";
 
-
-const [title, shortDescription, content] = postValidationMiddleware
-const validationCreatePostForBlog = [title, shortDescription, content]
 
 export const blogRouter = Router({})
 
@@ -28,7 +25,7 @@ blogRouter.post('/:id/posts/',
     authorizationMiddleware,
     idValidationMiddleware,
     idInputMiddleware,
-    validationCreatePostForBlog,
+    postQueryValidationMiddleware,
     inputValidationMiddleware,
     blogsController.createNewPostForBlog)
 
