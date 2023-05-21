@@ -11,9 +11,8 @@ export const blogsQueryRepository = {
     async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
 
         const queryResult = await this._paginationAndSortToQueryParam(query)
-
         const arrBlogs: BlogModel[] = await blogsCollections
-            .find({name: {$regex: queryResult.searchNameTerm}})
+            .find({$or: [{name: {$regex: queryResult.searchNameTerm || ''}}]})
             .sort({[queryResult.sortBy]: queryResult.sortDirection})
             .limit(+queryResult.pageSize)
             .skip(queryResult.skipPage)
@@ -37,7 +36,7 @@ export const blogsQueryRepository = {
             pageSize: pageSize || 10
         }
         const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
-        const totalCount = await blogsCollections.countDocuments({name: {$regex: searchNameTerm}})
+        const totalCount = await blogsCollections.countDocuments({$or: [{name: {$regex: searchNameTerm || ''}}]})
         const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
         return {
             ...paramSortPagination,
@@ -45,6 +44,5 @@ export const blogsQueryRepository = {
             totalCount,
             pagesCount
         }
-
     },
 }
