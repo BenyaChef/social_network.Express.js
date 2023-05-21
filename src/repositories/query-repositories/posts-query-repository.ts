@@ -31,7 +31,9 @@ export const postsQueryRepository = {
             .limit(+queryResult.pageSize)
             .skip(queryResult.skipPage)
             .toArray()
-        if(arrPosts.length <= 0) return false
+        if(arrPosts.length <= 0) {
+            return false
+        }
         return {
             pagesCount: queryResult.pagesCount,
             page: +queryResult.pageNumber,

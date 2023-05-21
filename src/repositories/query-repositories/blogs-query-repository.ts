@@ -12,7 +12,7 @@ export const blogsQueryRepository = {
 
         const queryResult = await this._paginationAndSortToQueryParam(query)
         const arrBlogs: BlogModel[] = await blogsCollections
-            .find({$or: [{name: {$regex: queryResult.searchNameTerm || ''}}]})
+            .find({$or: [{name: {$regex: queryResult.searchNameTerm || '', $options: 'ix'}}]})
             .sort({[queryResult.sortBy]: queryResult.sortDirection})
             .limit(+queryResult.pageSize)
             .skip(queryResult.skipPage)
@@ -36,7 +36,7 @@ export const blogsQueryRepository = {
             pageSize: pageSize || 10
         }
         const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
-        const totalCount = await blogsCollections.countDocuments({$or: [{name: {$regex: searchNameTerm || ''}}]})
+        const totalCount = await blogsCollections.countDocuments({$or: [{name: {$regex: searchNameTerm || '', $options: "ix"}}]})
         const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
         return {
             ...paramSortPagination,
