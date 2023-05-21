@@ -6,6 +6,7 @@ import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {idInputMiddleware} from "../middlewares/id-input-middleware";
 import {blogsController} from "../controller/blogs-controller";
 import {postQueryValidationMiddleware} from "../middlewares/post-query-validation";
+import {idQueryInputMiddleware} from "../middlewares/id-query-input";
 
 
 export const blogRouter = Router({})
@@ -19,6 +20,8 @@ blogRouter.get('/:id',
 
 
 blogRouter.get('/:id/posts/',
+    idValidationMiddleware,
+    idQueryInputMiddleware,
     blogsController.getAllPostsForBlog)
 
 blogRouter.post('/:id/posts/',
