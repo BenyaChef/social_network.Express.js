@@ -21,7 +21,7 @@ blogRouter.get('/:id',
     blogsController.findBlogById)
 
 
-blogRouter.get('/:blogId/posts/',
+blogRouter.get('/:id/posts/',
     blogsController.getAllPostsForBlog)
 
 blogRouter.post('/:id/posts/',
