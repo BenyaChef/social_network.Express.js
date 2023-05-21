@@ -21,13 +21,12 @@ blogRouter.get('/:id',
 
 
 blogRouter.get('/:id/posts/',
-    idQueryValidationMiddleware,
-    idQueryInputMiddleware,
+
     blogsController.getAllPostsForBlog)
 
 blogRouter.post('/:id/posts/',
     authorizationMiddleware,
-    idValidationMiddleware,
+    idQueryValidationMiddleware,
     idInputMiddleware,
     postQueryValidationMiddleware,
     inputValidationMiddleware,
