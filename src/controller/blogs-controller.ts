@@ -29,7 +29,6 @@ export const blogsController = {
 
     async findBlogById(req: RequestWithParams<{ id: string }>,
                        res: Response<BlogViewModel | boolean>) {
-
         const foundBlog: BlogViewModel | boolean = await blogsService.findBlogByID(req.params.id)
         if (!foundBlog) {
             return res.sendStatus(HTTP_STATUS.Not_found)
