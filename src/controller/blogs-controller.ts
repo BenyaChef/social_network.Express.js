@@ -3,7 +3,7 @@ import {
     RequestWithParams,
     RequestWithParamsAndBody, RequestWithParamsAndQuery,
     RequestWithQuery
-} from "../models/request-models/RequestTypes";
+} from "../models/request-models/request-types";
 import {Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {blogsService} from "../domain/blogs-service";

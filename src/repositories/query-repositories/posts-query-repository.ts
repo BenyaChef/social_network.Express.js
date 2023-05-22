@@ -4,6 +4,7 @@ import {postsCollections} from "../../db/db";
 import {mapPosts} from "../../utils/helpers/map-posts";
 import {SortDirectionEnum} from "../../enum/sort-direction";
 import {PostsPaginationSortQueryModel} from "../../models/request-models/posts-paginations-sort-query-model";
+import {SortByEnum} from "../../enum/sort-by-enum";
 
 export const postsQueryRepository = {
     async getAllPost(query: PostsPaginationSortQueryModel) : Promise<PostsViewSortPaginationModel> {
@@ -46,7 +47,7 @@ export const postsQueryRepository = {
     _paginationAndSortToQueryParam: async (query: PostsPaginationSortQueryModel, blogId?: string) => {
         const {sortBy, sortDirection, pageNumber, pageSize} = query
         const paramSortPagination: PostsPaginationSortQueryModel = {
-            sortBy: sortBy || 'createdAt',
+            sortBy: sortBy || SortByEnum.createdAt,
             sortDirection: sortDirection || SortDirectionEnum.desc,
             pageNumber: pageNumber || 1,
             pageSize: pageSize || 10

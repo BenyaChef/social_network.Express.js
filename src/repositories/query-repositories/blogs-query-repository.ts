@@ -4,6 +4,7 @@ import {mapBlogs} from "../../utils/helpers/map-blogs";
 import {BlogsPaginationSortQueryModel} from "../../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../../models/blogs-models/blogs-view-sort-pagin-model";
 import {SortDirectionEnum} from "../../enum/sort-direction";
+import {SortByEnum} from "../../enum/sort-by-enum";
 
 
 export const blogsQueryRepository = {
@@ -30,7 +31,7 @@ export const blogsQueryRepository = {
         const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = query
         const paramSortPagination: BlogsPaginationSortQueryModel = {
             searchNameTerm: searchNameTerm || null,
-            sortBy: sortBy || 'createdAt',
+            sortBy: sortBy || SortByEnum.createdAt,
             sortDirection: sortDirection || SortDirectionEnum.desc,
             pageNumber: pageNumber || 1,
             pageSize: pageSize || 10
