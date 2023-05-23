@@ -6,6 +6,6 @@ export interface UsersPaginationSortQueryModel {
     sortDirection: SortDirectionEnum
     pageNumber: number
     pageSize: number
-    searchEmailTerm: string
-    searchLoginTerm: string
+    searchEmailTerm: string | null
+    searchLoginTerm: string | null
 }

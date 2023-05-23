@@ -5441,6 +5441,5 @@
 /.idea/blogs and posts.iml
 /.idea/modules.xml
 /.idea/vcs.xml
-/dist/index.js
-dist
+/dist/
 .env

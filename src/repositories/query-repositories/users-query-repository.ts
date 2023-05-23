@@ -9,46 +9,50 @@ import {mapUsers} from "../../utils/helpers/map-users";
 export const usersQueryRepository = {
 
     async getAllUsers(query: UsersPaginationSortQueryModel): Promise<UsersViewPaginationSortModel> {
-        const queryResult = await this._paginationAndSortToQueryParam(query)
-        const searchEmail = {$regex: queryResult.searchEmailTerm, $options: "ix"}
-        const searchLogin = {$regex: queryResult.searchLoginTerm, $options: 'ix'}
+        const aggregationResult = this._aggregationOfQueryParameters(query)
+        const {searchEmailTerm, searchLoginTerm, sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+        const searchEmail = searchEmailTerm !== null ? {email: {$regex: searchEmailTerm, $options: "ix"}} : {}
+        const searchLogin = searchLoginTerm !== null ? {login: {$regex: searchLoginTerm, $options: 'ix'}} : {}
+
+        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchEmail, searchLogin)
+        const {skipPage, totalCount, pagesCount} = processingResult
+
         const arrUsers: UsersDBModel[] = await usersCollections
-            .find({$or: [{email: searchEmail}, {login: searchLogin}]})
-            .sort({[queryResult.sortBy]: queryResult.sortDirection})
-            .limit(+queryResult.pageSize)
-            .skip(queryResult.skipPage)
+            .find({$or: [searchEmail, searchLogin]})
+            .sort({[sortBy]: sortDirection})
+            .limit(+pageSize)
+            .skip(skipPage)
             .toArray()
         return {
-            pagesCount: queryResult.pagesCount,
-            page: +queryResult.pageNumber,
-            pageSize: +queryResult.pageSize,
-            totalCount: queryResult.totalCount,
+            pagesCount: pagesCount,
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: totalCount,
             items: arrUsers.map(user => mapUsers(user))
         }
     },
 
-    _paginationAndSortToQueryParam: async (query: UsersPaginationSortQueryModel) => {
-        const {searchLoginTerm, searchEmailTerm, sortBy, sortDirection, pageNumber, pageSize} = query
+    _aggregationOfQueryParameters: (query: UsersPaginationSortQueryModel) => {
         const paramSortPagination: UsersPaginationSortQueryModel = {
-            searchEmailTerm: searchEmailTerm || '',
-            searchLoginTerm: searchLoginTerm || '',
-            sortBy: sortBy || SortByEnum.createdAt,
-            sortDirection: sortDirection || SortDirectionEnum.desc,
-            pageNumber: pageNumber || 1,
-            pageSize: pageSize || 10
+            searchEmailTerm: query.searchEmailTerm || null,
+            searchLoginTerm: query.searchLoginTerm || null,
+            sortBy: query.sortBy || SortByEnum.createdAt,
+            sortDirection: query.sortDirection || SortDirectionEnum.desc,
+            pageNumber: query.pageNumber || 1,
+            pageSize: query.pageSize || 10
         }
+        return paramSortPagination
+    },
 
-        const searchEmail = {$regex: searchEmailTerm, $options: "ix"}
-        const searchLogin = {$regex: searchLoginTerm, $options: 'ix'}
-        const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
-        const totalCount = await usersCollections.countDocuments({$or: [{email: searchEmail}, {login: searchLogin}]})
-        const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
-        return {
-            ...paramSortPagination,
-            skipPage,
-            totalCount,
-            pagesCount
-        }
-
-    }
+    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object, searchParamTwo: object) => {
+      const skipPage = (pageNumber - 1) * pageSize
+      const totalCount = await usersCollections.countDocuments({$or: [searchParamOne, searchParamTwo]})
+      const pagesCount = Math.ceil(totalCount / pageSize)
+      return {
+          skipPage,
+          totalCount,
+          pagesCount
+      }
+  }
 }
