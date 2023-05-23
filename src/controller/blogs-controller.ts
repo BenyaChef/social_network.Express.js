@@ -23,7 +23,8 @@ import {postsService} from "../domain/posts-service";
 
 export const blogsController = {
 
-    async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>, res: Response<BlogsViewSortPaginationModel>) {
+    async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
+                      res: Response<BlogsViewSortPaginationModel>) {
         res.status(HTTP_STATUS.OK).send(await blogsQueryRepository.getAllBlogs(req.query))
     },
 

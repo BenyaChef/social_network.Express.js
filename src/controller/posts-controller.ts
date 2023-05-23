@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {postsService} from "../domain/posts-service";
@@ -7,7 +7,7 @@ import {
     RequestWithParams,
     RequestWithParamsAndBody,
     RequestWithQuery
-} from "../models/request-models/RequestTypes";
+} from "../models/request-models/request-types";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {BlogsPaginationSortQueryModel} from "../models/request-models/blogs-pagination-sort-query-model";

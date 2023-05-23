@@ -10,7 +10,6 @@ import {SortByEnum} from "../../enum/sort-by-enum";
 export const blogsQueryRepository = {
 
     async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
-
         const queryResult = await this._paginationAndSortToQueryParam(query)
         const arrBlogs: BlogModel[] = await blogsCollections
             .find({$or: [{name: {$regex: queryResult.searchNameTerm || '', $options: 'ix'}}]})
