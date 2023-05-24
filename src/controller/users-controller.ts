@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {Response, Request} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/request-models/request-types";
 import {UserInputModel} from "../models/users-model/user-input-model";
 import {usersService} from "../domain/users-service";
@@ -6,6 +6,8 @@ import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {UsersPaginationSortQueryModel} from "../models/request-models/users-pagination-sort-model";
 import {UsersViewPaginationSortModel} from "../models/users-model/users-view-pagination-sort-model";
+
+
 
 export const usersController = {
    async getAllUsers(req: RequestWithQuery<UsersPaginationSortQueryModel>,

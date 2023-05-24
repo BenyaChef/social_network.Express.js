@@ -1,5 +1,4 @@
 import {body} from "express-validator";
-
 const allBodyValues = ['name', 'description', 'websiteUrl']
 const [name, description, websiteUrl] = allBodyValues
 

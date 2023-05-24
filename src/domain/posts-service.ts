@@ -2,7 +2,7 @@ import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {ObjectId} from "mongodb";
-import {findBlogNameByID} from "../utils/helpers/find-blogID";
+import {findBlogNameByID} from "../utils/helpers/find-blog-name-by-ID";
 import {postsRepository} from "../repositories/posts-repository";
 
 export const postsService = {
