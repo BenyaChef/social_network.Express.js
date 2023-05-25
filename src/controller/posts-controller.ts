@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
-import {postsService} from "../domain/posts-service";
+import {postsService, ResultCode} from "../domain/posts-service";
 import {
     RequestWithBody,
     RequestWithParams,
@@ -32,11 +32,13 @@ export const postsController = {
 
     async createNewPost(req: RequestWithBody<CreatePostModel>,
                         res: Response<PostViewModel | boolean>) {
-        const newPost = await postsService.createNewPost(req.body)
-        if (!newPost) {
+        const newPostResult = await postsService.createNewPost(req.body)
+        //postQueryRepo.getById(id)
+        if (newPostResult.code !== ResultCode.Success) {
+            //const httpCode = handleErrorCode(result.code)
             return res.sendStatus(HTTP_STATUS.Bad_request)
         }
-        return res.status(HTTP_STATUS.Created).send(newPost)
+        return res.status(HTTP_STATUS.Created).send(newPostResult.data!)
     },
 
     async updatePostByID(req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,

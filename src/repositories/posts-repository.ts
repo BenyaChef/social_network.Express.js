@@ -9,14 +9,17 @@ import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 
 export const postsRepository = {
 
-    async findPostByID(id: string): Promise<PostViewModel | boolean> {
+    async findPostByID(id: string): Promise<PostViewModel | null> {
         const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
-        if (!isFind) return false
+        if (!isFind) return null
         return mapPosts(isFind)
     },
 
-    async createNewPost(newPost: CreatePostModel): Promise<PostViewModel> {
-        await postsCollections.insertOne(newPost)
+    async createNewPost(newPost: CreatePostModel): Promise<PostViewModel | null> {
+       const result = await postsCollections.insertOne(newPost)
+        if(!result.acknowledged) {
+            return null
+        }
         return mapPosts(newPost)
     },
 
