@@ -20,8 +20,8 @@ export const usersQueryRepository = {
 
         const arrUsers: UsersDBModel[] = await usersCollections
             .find({$or: [searchEmail, searchLogin]})
-            .sort({[sortBy]: sortDirection})
-            .limit(+pageSize)
+            .sort({[sortBy]: sortDirection!})
+            .limit(+pageSize!)
             .skip(skipPage)
             .toArray()
         return {
@@ -33,8 +33,8 @@ export const usersQueryRepository = {
         }
     },
 
-    _aggregationOfQueryParameters: (query: UsersPaginationSortQueryModel) => {
-        const paramSortPagination: UsersPaginationSortQueryModel = {
+    _aggregationOfQueryParameters: (query: UsersPaginationSortQueryModel) : Required<UsersPaginationSortQueryModel> => {
+        const paramSortPagination = {
             searchEmailTerm: query.searchEmailTerm || null,
             searchLoginTerm: query.searchLoginTerm || null,
             sortBy: query.sortBy || SortByEnum.createdAt,

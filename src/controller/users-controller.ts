@@ -1,4 +1,4 @@
-import {Response, Request} from "express";
+import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/request-models/request-types";
 import {UserInputModel} from "../models/users-model/user-input-model";
 import {usersService} from "../domain/users-service";

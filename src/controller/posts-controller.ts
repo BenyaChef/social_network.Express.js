@@ -10,13 +10,13 @@ import {
 } from "../models/request-models/request-types";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
-import {BlogsPaginationSortQueryModel} from "../models/request-models/blogs-pagination-sort-query-model";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-sort-pagin-model";
+import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 
 export const postsController = {
 
-    async getAllPost(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
+    async getAllPost(req: RequestWithQuery<PostsPaginationSortQueryModel>,
                      res: Response<PostsViewSortPaginationModel>) {
         res.status(HTTP_STATUS.OK).send(await postsQueryRepository.getAllPost(req.query))
     },

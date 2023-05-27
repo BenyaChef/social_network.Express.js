@@ -7,61 +7,74 @@ import {PostsPaginationSortQueryModel} from "../../models/request-models/posts-p
 import {SortByEnum} from "../../enum/sort-by-enum";
 
 export const postsQueryRepository = {
-    async getAllPost(query: PostsPaginationSortQueryModel) : Promise<PostsViewSortPaginationModel> {
-        const queryResult = await this._paginationAndSortToQueryParam(query)
+    async getAllPost(query: PostsPaginationSortQueryModel): Promise<PostsViewSortPaginationModel> {
+        const aggregationResult = this._aggregationOfQueryParameters(query)
+        const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize)
+        const {skipPage, pagesCount, totalCount} = processingResult
+
         const arrPosts: PostModel[] = await postsCollections
             .find({})
-            .sort({[queryResult.sortBy]: queryResult.sortDirection})
-            .limit(+queryResult.pageSize)
-            .skip(queryResult.skipPage)
+            .sort({[sortBy]: sortDirection})
+            .limit(pageSize)
+            .skip(skipPage)
             .toArray()
         return {
-            pagesCount: queryResult.pagesCount,
-            page: +queryResult.pageNumber,
-            pageSize: +queryResult.pageSize,
-            totalCount: queryResult.totalCount,
+            pagesCount: pagesCount,
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: totalCount,
             items: arrPosts.map(post => mapPosts(post))
         }
     },
 
-    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string) : Promise<PostsViewSortPaginationModel | boolean> {
-        const queryResult = await this._paginationAndSortToQueryParam(query, blogId)
+    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string): Promise<PostsViewSortPaginationModel | boolean> {
+        const aggregationResult = await this._aggregationOfQueryParameters(query)
+        const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, blogId, SortByEnum.blogId)
+        const {skipPage, pagesCount, totalCount} = processingResult
+
         const arrPosts: PostModel[] = await postsCollections
             .find({blogId: blogId})
-            .sort({[queryResult.sortBy]: queryResult.sortDirection})
-            .limit(+queryResult.pageSize)
-            .skip(queryResult.skipPage)
+            .sort({[sortBy]: sortDirection})
+            .limit(pageSize)
+            .skip(skipPage)
             .toArray()
-        if(arrPosts.length <= 0) {
+
+        if (arrPosts.length <= 0) {
             return false
         }
+
         return {
-            pagesCount: queryResult.pagesCount,
-            page: +queryResult.pageNumber,
-            pageSize: +queryResult.pageSize,
-            totalCount: queryResult.totalCount,
+            pagesCount: pagesCount,
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: totalCount,
             items: arrPosts.map(post => mapPosts(post))
         }
     },
 
-    _paginationAndSortToQueryParam: async (query: PostsPaginationSortQueryModel, blogId?: string) => {
-        const {sortBy, sortDirection, pageNumber, pageSize} = query
-        const paramSortPagination: PostsPaginationSortQueryModel = {
-            sortBy: sortBy || SortByEnum.createdAt,
-            sortDirection: sortDirection || SortDirectionEnum.desc,
-            pageNumber: pageNumber || 1,
-            pageSize: pageSize || 10
+    _aggregationOfQueryParameters: (query: PostsPaginationSortQueryModel): Required<PostsPaginationSortQueryModel> => {
+        const paramSortPagination = {
+            sortBy: query.sortBy || SortByEnum.createdAt,
+            sortDirection: query.sortDirection || SortDirectionEnum.desc,
+            pageNumber: query.pageNumber || 1,
+            pageSize: query.pageSize || 10
         }
-        const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
-        const totalCount = blogId ? await postsCollections.countDocuments({blogId}) : await postsCollections.countDocuments()
-        const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
+        return paramSortPagination
+    },
+
+    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
+        const skipPage = (pageNumber - 1) * pageSize
+        const filter = field !== undefined ? {[field]: value} : {}
+        const totalCount = await postsCollections.countDocuments(filter)
+        const pagesCount = Math.ceil(totalCount / pageSize)
         return {
-            ...paramSortPagination,
             skipPage,
             totalCount,
             pagesCount
         }
-
     },
-
 }

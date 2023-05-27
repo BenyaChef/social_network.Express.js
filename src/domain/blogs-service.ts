@@ -7,7 +7,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 
 export const blogsService = {
 
-    async findBlogByID(id: string): Promise<BlogViewModel | boolean> {
+    async findBlogByID(id: string): Promise<BlogViewModel | null> {
         return await blogsRepository.findBlogByID(id)
     },
 

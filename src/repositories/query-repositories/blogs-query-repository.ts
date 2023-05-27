@@ -10,36 +10,46 @@ import {SortByEnum} from "../../enum/sort-by-enum";
 export const blogsQueryRepository = {
 
     async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
-        const queryResult = await this._paginationAndSortToQueryParam(query)
+        const aggregationResult = this._aggregationOfQueryParameters(query)
+        const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+        const searchName = searchNameTerm !== null ? {name: {$regex: searchNameTerm, $options: 'ix'}} : {}
+
+        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchName)
+        const {skipPage, totalCount, pagesCount} = processingResult
+
         const arrBlogs: BlogModel[] = await blogsCollections
-            .find({$or: [{name: {$regex: queryResult.searchNameTerm || '', $options: 'ix'}}]})
-            .sort({[queryResult.sortBy]: queryResult.sortDirection})
-            .limit(+queryResult.pageSize)
-            .skip(queryResult.skipPage)
+            .find(searchName)
+            .sort({[sortBy]: sortDirection})
+            .limit(pageSize)
+            .skip(skipPage)
             .toArray()
         return {
-            pagesCount: queryResult.pagesCount,
-            page: +queryResult.pageNumber,
-            pageSize: +queryResult.pageSize,
-            totalCount: queryResult.totalCount,
+            pagesCount: pagesCount,
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: totalCount,
             items: arrBlogs.map(blog => mapBlogs(blog))
         }
     },
 
-    _paginationAndSortToQueryParam: async (query: BlogsPaginationSortQueryModel) => {
-        const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = query
-        const paramSortPagination: BlogsPaginationSortQueryModel = {
-            searchNameTerm: searchNameTerm || null,
-            sortBy: sortBy || SortByEnum.createdAt,
-            sortDirection: sortDirection || SortDirectionEnum.desc,
-            pageNumber: pageNumber || 1,
-            pageSize: pageSize || 10
+    _aggregationOfQueryParameters: (query: BlogsPaginationSortQueryModel): Required<BlogsPaginationSortQueryModel> => {
+        const paramSortPagination = {
+            searchNameTerm: query.searchNameTerm || null,
+            sortBy: query.sortBy || SortByEnum.createdAt,
+            sortDirection: query.sortDirection || SortDirectionEnum.desc,
+            pageNumber: query.pageNumber || 1,
+            pageSize: query.pageSize || 10
         }
-        const skipPage = (paramSortPagination.pageNumber - 1) * paramSortPagination.pageSize
-        const totalCount = await blogsCollections.countDocuments({$or: [{name: {$regex: searchNameTerm || '', $options: "ix"}}]})
-        const pagesCount = Math.ceil(totalCount / paramSortPagination.pageSize)
+        return paramSortPagination
+    },
+
+
+    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object) => {
+        const skipPage = (pageNumber - 1) * pageSize
+        const totalCount = await blogsCollections.countDocuments(searchParamOne)
+        const pagesCount = Math.ceil(totalCount / pageSize)
         return {
-            ...paramSortPagination,
             skipPage,
             totalCount,
             pagesCount
