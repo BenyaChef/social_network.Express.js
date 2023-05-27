@@ -18,19 +18,6 @@ type Result<T> = {
     errorMessage: string | null
 }
 
-class NotFoundDomainError extends Error {
-    constructor(message: string) {
-        super(message);
-    }
-}
-
-const controller = () => {
-    try {
-        //flow
-    } catch (e) {
-        if(e instanceof NotFoundDomainError) res.status(400)
-    }
-}
 
 export const postsService = {
 
