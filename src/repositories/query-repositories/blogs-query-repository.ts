@@ -5,32 +5,49 @@ import {BlogsPaginationSortQueryModel} from "../../models/request-models/blogs-p
 import {BlogsViewSortPaginationModel} from "../../models/blogs-models/blogs-view-sort-pagin-model";
 import {SortDirectionEnum} from "../../enum/sort-direction";
 import {SortByEnum} from "../../enum/sort-by-enum";
+import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
+import {ObjectId} from "mongodb";
 
 
 export const blogsQueryRepository = {
 
-    async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
-        const aggregationResult = this._aggregationOfQueryParameters(query)
-        const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
-
-        const searchName = searchNameTerm !== null ? {name: {$regex: searchNameTerm, $options: 'ix'}} : {}
-
-        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchName)
-        const {skipPage, totalCount, pagesCount} = processingResult
-
-        const arrBlogs: BlogModel[] = await blogsCollections
-            .find(searchName)
-            .sort({[sortBy]: sortDirection})
-            .limit(pageSize)
-            .skip(skipPage)
-            .toArray()
-        return {
-            pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: arrBlogs.map(blog => mapBlogs(blog))
+    async findBlogByID(id: string): Promise<BlogViewModel | null> {
+        try {
+            const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
+            if (!isFind) return null
+            return mapBlogs(isFind);
+        } catch (e) {
+            return null
         }
+    },
+
+    async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel | boolean> {
+        try {
+            const aggregationResult = this._aggregationOfQueryParameters(query)
+            const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+            const searchName = searchNameTerm !== null ? {name: {$regex: searchNameTerm, $options: 'ix'}} : {}
+
+            const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchName)
+            const {skipPage, totalCount, pagesCount} = processingResult
+
+            const arrBlogs: BlogModel[] = await blogsCollections
+                .find(searchName)
+                .sort({[sortBy]: sortDirection})
+                .limit(pageSize)
+                .skip(skipPage)
+                .toArray()
+            return {
+                pagesCount: pagesCount,
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: totalCount,
+                items: arrBlogs.map(blog => mapBlogs(blog))
+            }
+        } catch (e) {
+            return false
+        }
+
     },
 
     _aggregationOfQueryParameters: (query: BlogsPaginationSortQueryModel): Required<BlogsPaginationSortQueryModel> => {

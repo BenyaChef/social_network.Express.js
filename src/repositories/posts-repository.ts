@@ -1,26 +1,20 @@
-import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostModel} from "../models/posts-models/PostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {postsCollections} from "../db/db";
-import {mapPosts} from "../utils/helpers/map-posts";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 
 
 export const postsRepository = {
 
-    async findPostByID(id: string): Promise<PostViewModel | null> {
-        const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
-        if (!isFind) return null
-        return mapPosts(isFind)
-    },
 
-    async createNewPost(newPost: CreatePostModel): Promise<PostViewModel | null> {
-       const result = await postsCollections.insertOne(newPost)
-        if(!result.acknowledged) {
+    async createNewPost(newPost: CreatePostModel): Promise<ObjectId | null> {
+        try {
+            const result = await postsCollections.insertOne(newPost)
+            return result.insertedId
+        } catch (e) {
             return null
         }
-        return mapPosts(newPost)
     },
 
     async updatePostByID(id: string, updatePost: UpdatePostModel): Promise<boolean> {

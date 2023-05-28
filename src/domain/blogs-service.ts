@@ -1,4 +1,3 @@
-import {BlogViewModel} from "../models/blogs-models/blog-view-model";
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
 import {ObjectId} from "mongodb";
@@ -7,11 +6,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 
 export const blogsService = {
 
-    async findBlogByID(id: string): Promise<BlogViewModel | null> {
-        return await blogsRepository.findBlogByID(id)
-    },
-
-    async createNewBlog(body: CreateBlogModel): Promise<BlogViewModel> {
+    async createNewBlog(body: CreateBlogModel): Promise<ObjectId | boolean> {
         const newBlog: CreateBlogModel = {
             _id: new ObjectId,
             name: body.name,

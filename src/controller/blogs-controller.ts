@@ -19,18 +19,23 @@ import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-so
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {postsService} from "../domain/posts-service";
+import {ObjectId} from "mongodb";
 
 
 export const blogsController = {
 
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
-                      res: Response<BlogsViewSortPaginationModel>) {
-        res.status(HTTP_STATUS.OK).send(await blogsQueryRepository.getAllBlogs(req.query))
+                      res: Response<BlogsViewSortPaginationModel | boolean>) {
+        const resultSearch: BlogsViewSortPaginationModel | boolean = await blogsQueryRepository.getAllBlogs(req.query)
+        if (!resultSearch) {
+            return res.sendStatus(HTTP_STATUS.Server_error)
+        }
+        return res.status(HTTP_STATUS.OK).send(resultSearch)
     },
 
     async findBlogById(req: RequestWithParams<{ id: string }>,
-                       res: Response<BlogViewModel | boolean>) {
-        const foundBlog: BlogViewModel | null = await blogsService.findBlogByID(req.params.id)
+                       res: Response<BlogViewModel>) {
+        const foundBlog: BlogViewModel | null = await blogsQueryRepository.findBlogByID(req.params.id)
         if (!foundBlog) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -56,17 +61,19 @@ export const blogsController = {
     },
 
     async createNewBlog(req: RequestWithBody<CreateBlogModel>,
-                        res: Response<BlogViewModel>) {
-        const newBlog: BlogViewModel = await blogsService.createNewBlog(req.body)
-        if (!newBlog) {
-            return res.sendStatus(HTTP_STATUS.Bad_request)
+                        res: Response<BlogViewModel | boolean>) {
+        const newBlogId: ObjectId | boolean = await blogsService.createNewBlog(req.body)
+        if (!newBlogId) {
+            return res.sendStatus(HTTP_STATUS.Server_error)
         }
+        const newBlog = await blogsQueryRepository.findBlogByID(newBlogId.toString())
+        if (!newBlog) return res.sendStatus(HTTP_STATUS.Not_found)
         return res.status(HTTP_STATUS.Created).send(newBlog)
     },
 
     async updateBlogByID(req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
                          res: Response) {
-        const isUpdate = await blogsService.updateBlogByID(req.params.id, req.body)
+        const isUpdate: boolean = await blogsService.updateBlogByID(req.params.id, req.body)
         if (!isUpdate) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -75,7 +82,7 @@ export const blogsController = {
 
     async deleteBlogByID(req: RequestWithParams<{ id: string }>,
                          res: Response) {
-        const isDeleted = await blogsService.deleteBlogByID(req.params.id)
+        const isDeleted: boolean = await blogsService.deleteBlogByID(req.params.id)
         if (!isDeleted) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }

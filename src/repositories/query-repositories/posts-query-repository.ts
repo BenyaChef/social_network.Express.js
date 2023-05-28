@@ -5,28 +5,47 @@ import {mapPosts} from "../../utils/helpers/map-posts";
 import {SortDirectionEnum} from "../../enum/sort-direction";
 import {PostsPaginationSortQueryModel} from "../../models/request-models/posts-paginations-sort-query-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
+import {PostViewModel} from "../../models/posts-models/PostViewModel";
+import {ObjectId} from "mongodb";
 
 export const postsQueryRepository = {
-    async getAllPost(query: PostsPaginationSortQueryModel): Promise<PostsViewSortPaginationModel> {
-        const aggregationResult = this._aggregationOfQueryParameters(query)
-        const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
-        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize)
-        const {skipPage, pagesCount, totalCount} = processingResult
-
-        const arrPosts: PostModel[] = await postsCollections
-            .find({})
-            .sort({[sortBy]: sortDirection})
-            .limit(pageSize)
-            .skip(skipPage)
-            .toArray()
-        return {
-            pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: arrPosts.map(post => mapPosts(post))
+    async findPostByID(id: string): Promise<PostViewModel | boolean> {
+        try {
+            const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
+            if (!isFind) return false
+            return mapPosts(isFind)
+        } catch (e) {
+            return false
         }
+    },
+
+
+    async getAllPost(query: PostsPaginationSortQueryModel): Promise<PostsViewSortPaginationModel | boolean> {
+        try {
+            const aggregationResult = this._aggregationOfQueryParameters(query)
+            const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
+
+            const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize)
+            const {skipPage, pagesCount, totalCount} = processingResult
+
+            const arrPosts: PostModel[] = await postsCollections
+                .find({})
+                .sort({[sortBy]: sortDirection})
+                .limit(pageSize)
+                .skip(skipPage)
+                .toArray()
+            return {
+                pagesCount: pagesCount,
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: totalCount,
+                items: arrPosts.map(post => mapPosts(post))
+            }
+        } catch (e) {
+            return false
+        }
+
     },
 
     async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string): Promise<PostsViewSortPaginationModel | boolean> {

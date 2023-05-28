@@ -4,34 +4,18 @@ import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {ObjectId} from "mongodb";
 import {findBlogNameByID} from "../utils/helpers/find-blog-name-by-ID";
 import {postsRepository} from "../repositories/posts-repository";
-import {blogsRepository} from "../repositories/blogs-repository";
-
-export enum ResultCode {
-    Success,
-    NotFound,
-    ServerError
-}
-
-type Result<T> = {
-    data: T | null
-    code: ResultCode
-    errorMessage: string | null
-}
-
+import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
+import {ResultCodeHandler} from "../models/result-code-handler";
+import {Errors} from "../enum/errors";
+import {resultCodeMap} from "../utils/helpers/result-code";
 
 export const postsService = {
 
-    async findPostByID(id: string): Promise<PostViewModel | null> {
-        return await postsRepository.findPostByID(id)
-    },
-
-    async createNewPost(body: CreatePostModel): Promise<Result<PostViewModel>> {
-        const blog = await blogsRepository.findBlogByID(body.blogId);
-
-        if(!blog) {
-            throw new NotFoundDomainError('blog not found')
+    async createNewPost(body: CreatePostModel): Promise<ResultCodeHandler<ObjectId>> {
+        const blog = await blogsQueryRepository.findBlogByID(body.blogId);
+        if (!blog) {
+            return resultCodeMap(false, null, Errors.Not_Found)
         }
-
         const newPost: CreatePostModel = {
             _id: new ObjectId(),
             title: body.title,
@@ -41,25 +25,14 @@ export const postsService = {
             blogName: blog.name,
             createdAt: new Date().toISOString()
         }
-
-        const result = await postsRepository.createNewPost(newPost)
-
-        if (!result) {
-            return {
-                code: ResultCode.ServerError,
-                data: null,
-                errorMessage: null
-            }
+        const newPostId = await postsRepository.createNewPost(newPost)
+        if (!newPostId) {
+            return resultCodeMap(false, null, Errors.Error_Server)
         }
-
-        return {
-            code: ResultCode.Success,
-            data: result,
-            errorMessage: null
-        }
+        return resultCodeMap(true, newPostId)
     },
 
-    async createNewPostForBlog(blogId: string ,body: CreatePostModel) : Promise<PostViewModel> {
+    async createNewPostForBlog(blogId: string, body: CreatePostModel): Promise<PostViewModel> {
         const newPostForBlog: CreatePostModel = {
             _id: new ObjectId(),
             title: body.title,
