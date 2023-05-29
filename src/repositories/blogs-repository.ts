@@ -7,7 +7,7 @@ import {DeleteResult, InsertOneResult, ObjectId, UpdateResult} from "mongodb";
 
 export const blogsRepository = {
 
-    async createNewBlog(newBlog: CreateBlogModel): Promise<ObjectId | boolean> {
+    async createNewBlog(newBlog: CreateBlogModel): Promise<ObjectId> {
         const insertedResult = await blogsCollections.insertOne(newBlog)
         return insertedResult.insertedId
     },

@@ -3,12 +3,11 @@ import bcrypt from 'bcrypt'
 import {UsersDBModel} from "../models/users-model/users-db-model";
 import {ObjectId} from "mongodb";
 import {usersRepository} from "../repositories/users-repository";
-import {UserViewModel} from "../models/users-model/user-view-model";
 import {LoginInputModel} from "../models/login-models/login-input-model";
 
 export const usersService = {
 
-    async createUser(body: UserInputModel): Promise<UserViewModel> {
+    async createUser(body: UserInputModel): Promise<ObjectId> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(body.password, passwordSalt)
 

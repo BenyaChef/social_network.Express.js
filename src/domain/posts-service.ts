@@ -9,7 +9,7 @@ import {resultCodeMap} from "../utils/helpers/result-code";
 
 export const postsService = {
 
-    async createNewPost(body: CreatePostModel): Promise<ResultCodeHandler<ObjectId>> {
+    async createNewPost(body: CreatePostModel): Promise<ResultCodeHandler<ObjectId | null>> {
         const blog = await blogsQueryRepository.findBlogByID(body.blogId);
         if (!blog) {
             return resultCodeMap(false, null, Errors.Bad_Request)
@@ -27,7 +27,7 @@ export const postsService = {
         return resultCodeMap(true, newPostId)
     },
 
-    async createNewPostForBlog(blogId: string, body: CreatePostModel): Promise<ResultCodeHandler<ObjectId>> {
+    async createNewPostForBlog(blogId: string, body: CreatePostModel): Promise<ResultCodeHandler<ObjectId | null>> {
         const blog = await blogsQueryRepository.findBlogByID(blogId);
         if (!blog) {
             return resultCodeMap(false, null, Errors.Not_Found)
@@ -45,7 +45,7 @@ export const postsService = {
         return resultCodeMap(true, newPostId)
     },
 
-    async updatePostByID(id: string, body: UpdatePostModel): Promise<ResultCodeHandler<ObjectId>> {
+    async updatePostByID(id: string, body: UpdatePostModel): Promise<ResultCodeHandler<ObjectId | null>> {
         const blog = await blogsQueryRepository.findBlogByID(body.blogId);
         if (!blog) {
             return resultCodeMap(false, null, Errors.Bad_Request)
@@ -64,7 +64,7 @@ export const postsService = {
         return resultCodeMap(true, null)
     },
 
-    async deletePostByID(id: string): Promise<ResultCodeHandler<ObjectId>> {
+    async deletePostByID(id: string): Promise<ResultCodeHandler<null>> {
         const idDelete = await postsRepository.deletePostByID(id)
         if(!idDelete) {
             return resultCodeMap(false, null, Errors.Not_Found)

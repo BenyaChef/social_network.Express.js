@@ -1,7 +1,6 @@
 import {Errors} from "../../enum/errors";
-import {ObjectId} from "mongodb";
 
-export const resultCodeMap = (success: boolean, data: ObjectId | null, error?: Errors) => {
+export const resultCodeMap = <T>(success: boolean, data: T, error?: Errors) => {
     return {
         success: success,
         data: data,

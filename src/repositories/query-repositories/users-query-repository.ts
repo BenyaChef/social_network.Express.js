@@ -5,8 +5,18 @@ import {SortDirectionEnum} from "../../enum/sort-direction";
 import {usersCollections} from "../../db/db";
 import {UsersDBModel} from "../../models/users-model/users-db-model";
 import {mapUsers} from "../../utils/helpers/map-users";
+import {UserViewModel} from "../../models/users-model/user-view-model";
+import {ObjectId} from "mongodb";
 
 export const usersQueryRepository = {
+
+    async findUserById(id: string) : Promise<UserViewModel | null> {
+        const isFind = await usersCollections.findOne({_id: new ObjectId(id)})
+        if(!isFind) {
+            return null
+        }
+        return mapUsers(isFind)
+    },
 
     async getAllUsers(query: UsersPaginationSortQueryModel): Promise<UsersViewPaginationSortModel> {
         const aggregationResult = this._aggregationOfQueryParameters(query)

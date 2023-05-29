@@ -18,7 +18,7 @@ export const blogsQueryRepository = {
 
     },
 
-    async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel | boolean> {
+    async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
         const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 

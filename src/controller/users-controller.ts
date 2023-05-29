@@ -6,10 +6,12 @@ import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {UsersPaginationSortQueryModel} from "../models/request-models/users-pagination-sort-model";
 import {UsersViewPaginationSortModel} from "../models/users-model/users-view-pagination-sort-model";
+import {ObjectId} from "mongodb";
 
 
 
 export const usersController = {
+
    async getAllUsers(req: RequestWithQuery<UsersPaginationSortQueryModel>,
                      res: Response<UsersViewPaginationSortModel>) {
         res.status(HTTP_STATUS.OK).send(await usersQueryRepository.getAllUsers(req.query))
@@ -17,8 +19,13 @@ export const usersController = {
 
    async createUser(req: RequestWithBody<UserInputModel>,
                     res: Response) {
-        const newUser = await usersService.createUser(req.body)
-       res.status(HTTP_STATUS.Created).send(newUser)
+        const newUserId: ObjectId = await usersService.createUser(req.body)
+
+       const newUser = await usersQueryRepository.findUserById(newUserId.toString())
+       if(!newUser) {
+           return res.sendStatus(HTTP_STATUS.Not_found)
+       }
+       return res.status(HTTP_STATUS.Created).send(newUser)
     },
 
    async deleteUsersById(req: RequestWithParams<{ id: string }>,
