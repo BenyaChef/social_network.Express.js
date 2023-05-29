@@ -10,19 +10,16 @@ import {ObjectId} from "mongodb";
 
 export const postsQueryRepository = {
 
-    async findPostByID(id: string): Promise<PostViewModel | boolean> {
-        try {
-            const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
-            if (!isFind) return false
-            return mapPosts(isFind)
-        } catch (e) {
-            return false
+    async findPostByID(id: string): Promise<PostViewModel | null> {
+        const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
+        if (!isFind) {
+            return null
         }
+        return mapPosts(isFind)
     },
 
 
     async getAllPost(query: PostsPaginationSortQueryModel): Promise<PostsViewSortPaginationModel | boolean> {
-        try {
             const aggregationResult = this._aggregationOfQueryParameters(query)
             const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
@@ -42,13 +39,10 @@ export const postsQueryRepository = {
                 totalCount: totalCount,
                 items: arrPosts.map(post => mapPosts(post))
             }
-        } catch (e) {
-            return false
-        }
 
     },
 
-    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string): Promise<PostsViewSortPaginationModel | boolean> {
+    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string): Promise<PostsViewSortPaginationModel | null> {
         const aggregationResult = await this._aggregationOfQueryParameters(query)
         const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
@@ -63,7 +57,7 @@ export const postsQueryRepository = {
             .toArray()
 
         if (arrPosts.length <= 0) {
-            return false
+            return null
         }
 
         return {

@@ -1,6 +1,7 @@
 import {body, param} from "express-validator";
 import {blogsRepository} from "../repositories/blogs-repository";
 import {ObjectId} from "mongodb";
+import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 
 
 const allBodyValues: string[] = ['title', 'shortDescription', 'content', 'blogId']
@@ -14,7 +15,7 @@ export const postQueryValidationMiddleware = [
         .trim()
         .custom(async value => {
             if (ObjectId.isValid(value)) {
-                const isFind = await blogsRepository.findBlogByID(value)
+                const isFind = await blogsQueryRepository.findBlogByID(value)
                 if (!isFind) {
                     throw new Error('blog with this id was not found')
                 }

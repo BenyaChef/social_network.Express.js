@@ -8,18 +8,15 @@ import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 export const postsRepository = {
 
 
-    async createNewPost(newPost: CreatePostModel): Promise<ObjectId | null> {
-        try {
+    async createNewPost(newPost: CreatePostModel): Promise<ObjectId> {
             const result = await postsCollections.insertOne(newPost)
             return result.insertedId
-        } catch (e) {
-            return null
-        }
     },
 
     async updatePostByID(id: string, updatePost: UpdatePostModel): Promise<boolean> {
         const findPost: UpdateResult<PostModel> = await postsCollections.updateOne({_id: new ObjectId(id)}, {$set: updatePost})
         return findPost.matchedCount === 1
+
     },
 
     async deletePostByID(id: string): Promise<boolean> {

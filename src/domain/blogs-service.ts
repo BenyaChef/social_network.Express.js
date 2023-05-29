@@ -7,6 +7,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 export const blogsService = {
 
     async createNewBlog(body: CreateBlogModel): Promise<ObjectId | boolean> {
+
         const newBlog: CreateBlogModel = {
             _id: new ObjectId,
             name: body.name,

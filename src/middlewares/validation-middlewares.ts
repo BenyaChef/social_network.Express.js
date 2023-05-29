@@ -1,5 +1,5 @@
 import {body} from "express-validator";
-import {ERRORS_MESSAGE} from "../enum/errors-messages";
+import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
 
 const loginOrEmailValidationRule = body('loginOrEmail')
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)

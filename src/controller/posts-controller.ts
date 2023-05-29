@@ -14,20 +14,18 @@ import {postsQueryRepository} from "../repositories/query-repositories/posts-que
 import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-sort-pagin-model";
 import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 import {Errors} from "../enum/errors";
+import {ErrorsMessages} from "../enum/errors-message";
 
 export const postsController = {
 
     async getAllPost(req: RequestWithQuery<PostsPaginationSortQueryModel>,
-                     res: Response<PostsViewSortPaginationModel>) {
+                     res: Response<PostsViewSortPaginationModel | boolean>) {
         const searchResult: PostsViewSortPaginationModel | boolean = await postsQueryRepository.getAllPost(req.query)
-        if (!searchResult) {
-            return res.sendStatus(HTTP_STATUS.Server_error)
-        }
-        return res.status(HTTP_STATUS.OK).send()
+        return res.status(HTTP_STATUS.OK).send(searchResult)
     },
 
     async getPostById(req: RequestWithParams<{ id: string }>,
-                      res: Response<PostViewModel | boolean>) {
+                      res: Response<PostViewModel>) {
         const isFind = await postsQueryRepository.findPostByID(req.params.id)
         if (!isFind) {
             return res.sendStatus(HTTP_STATUS.Not_found)
@@ -36,22 +34,26 @@ export const postsController = {
     },
 
     async createNewPost(req: RequestWithBody<CreatePostModel>,
-                        res: Response<PostViewModel | boolean>) {
+                        res: Response) {
         const newPostResult = await postsService.createNewPost(req.body)
-        if (newPostResult.error === Errors.Not_Found) {
+        if (!newPostResult.success) {
+            return res.sendStatus(HTTP_STATUS.Bad_request).json(ErrorsMessages.errorsMessages)
+        }
+        const newPostId = newPostResult.data!.toString()
+        const newPost = await postsQueryRepository.findPostByID(newPostId)
+        if (!newPost) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
-        if(newPostResult.data !== null) {
-            const newPost = await postsQueryRepository.findPostByID(newPostResult.data.toString())
-            return res.status(HTTP_STATUS.Created).send(newPost)
-        }
-
+        return res.status(HTTP_STATUS.Created).send(newPost)
     },
 
     async updatePostByID(req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
                          res: Response) {
-        const isUpdate = await postsService.updatePostByID(req.params.id, req.body)
-        if (!isUpdate) {
+        const isUpdateResult = await postsService.updatePostByID(req.params.id, req.body)
+        if (isUpdateResult.error === Errors.Bad_Request) {
+            return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages.errorsMessages)
+        }
+        if (isUpdateResult.error === Errors.Not_Found) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
@@ -60,7 +62,7 @@ export const postsController = {
     async deletePostByID(req: RequestWithParams<{ id: string }>,
                          res: Response) {
         const isDelete = await postsService.deletePostByID(req.params.id)
-        if (!isDelete) {
+        if (!isDelete.success) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.sendStatus(HTTP_STATUS.No_content)

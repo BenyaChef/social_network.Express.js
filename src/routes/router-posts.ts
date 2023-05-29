@@ -23,8 +23,6 @@ postRouter.post('/',
 
 postRouter.put('/:id',
     authorizationMiddleware,
-    idValidationMiddleware,
-    idInputMiddleware,
     postValidationMiddleware,
     inputValidationMiddleware,
     postsController.updatePostByID)

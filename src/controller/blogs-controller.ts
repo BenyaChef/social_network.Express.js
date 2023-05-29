@@ -20,6 +20,7 @@ import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {postsService} from "../domain/posts-service";
 import {ObjectId} from "mongodb";
+import {checkResultCode} from "../utils/helpers/check-result-code";
 
 
 export const blogsController = {
@@ -27,9 +28,6 @@ export const blogsController = {
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
                       res: Response<BlogsViewSortPaginationModel | boolean>) {
         const resultSearch: BlogsViewSortPaginationModel | boolean = await blogsQueryRepository.getAllBlogs(req.query)
-        if (!resultSearch) {
-            return res.sendStatus(HTTP_STATUS.Server_error)
-        }
         return res.status(HTTP_STATUS.OK).send(resultSearch)
     },
 
@@ -43,8 +41,8 @@ export const blogsController = {
     },
 
     async getAllPostsForBlog(req: RequestWithParamsAndQuery<{ id: string }, PostsPaginationSortQueryModel>,
-                             res: Response<PostsViewSortPaginationModel | boolean>) {
-        const foundPosts: PostsViewSortPaginationModel | boolean = await postsQueryRepository.getAllPostsForBlog(req.query, req.params.id)
+                             res: Response<PostsViewSortPaginationModel>) {
+        const foundPosts: PostsViewSortPaginationModel | null = await postsQueryRepository.getAllPostsForBlog(req.query, req.params.id)
         if (!foundPosts) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -53,9 +51,14 @@ export const blogsController = {
 
     async createNewPostForBlog(req: RequestWithParamsAndBody<{ id: string }, CreatePostModel>,
                                res: Response<PostViewModel>) {
-        const newPost: PostViewModel | boolean = await postsService.createNewPostForBlog(req.params.id, req.body)
-        if (!newPost) {
-            return res.sendStatus(HTTP_STATUS.Bad_request)
+        const newPostResult = await postsService.createNewPostForBlog(req.params.id, req.body)
+        if (!newPostResult.success) {
+            return res.sendStatus(HTTP_STATUS.Not_found)
+        }
+        const newPostId = newPostResult.data!.toString()
+        const newPost = await postsQueryRepository.findPostByID(newPostId)
+        if(!newPost) {
+            return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(newPost)
     },
@@ -67,7 +70,9 @@ export const blogsController = {
             return res.sendStatus(HTTP_STATUS.Server_error)
         }
         const newBlog = await blogsQueryRepository.findBlogByID(newBlogId.toString())
-        if (!newBlog) return res.sendStatus(HTTP_STATUS.Not_found)
+        if (!newBlog) {
+            return res.sendStatus(HTTP_STATUS.Not_found)
+        }
         return res.status(HTTP_STATUS.Created).send(newBlog)
     },
 
