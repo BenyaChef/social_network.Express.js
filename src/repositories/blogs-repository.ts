@@ -14,7 +14,7 @@ export const blogsRepository = {
 
     async updateBlogByID(id: string, updateBlog: UpdateBlogModel): Promise<boolean> {
         const isFind: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)}, {$set: updateBlog})
-        return isFind.matchedCount !== 1
+        return isFind.matchedCount === 1
 
 
     },
