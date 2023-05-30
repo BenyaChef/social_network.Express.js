@@ -52,7 +52,7 @@ export const postsQueryRepository = {
         const arrPosts: PostModel[] = await postsCollections
             .find({blogId: blogId})
             .sort({[sortBy]: sortDirection})
-            .limit(pageSize)
+            .limit(+pageSize)
             .skip(skipPage)
             .toArray()
 
@@ -62,8 +62,8 @@ export const postsQueryRepository = {
 
         return {
             pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
+            page: +pageNumber,
+            pageSize: +pageSize,
             totalCount: totalCount,
             items: arrPosts.map(post => mapPosts(post))
         }

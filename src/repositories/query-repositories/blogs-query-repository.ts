@@ -30,13 +30,13 @@ export const blogsQueryRepository = {
         const arrBlogs: BlogModel[] = await blogsCollections
             .find(searchName)
             .sort({[sortBy]: sortDirection})
-            .limit(pageSize)
+            .limit(+pageSize)
             .skip(skipPage)
             .toArray()
         return {
             pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
+            page: +pageNumber,
+            pageSize: +pageSize,
             totalCount: totalCount,
             items: arrBlogs.map(blog => mapBlogs(blog))
         }

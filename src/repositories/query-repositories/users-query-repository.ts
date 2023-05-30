@@ -30,8 +30,8 @@ export const usersQueryRepository = {
 
         const arrUsers: UsersDBModel[] = await usersCollections
             .find({$or: [searchEmail, searchLogin]})
-            .sort({[sortBy]: sortDirection!})
-            .limit(+pageSize!)
+            .sort({[sortBy]: sortDirection})
+            .limit(+pageSize)
             .skip(skipPage)
             .toArray()
         return {
