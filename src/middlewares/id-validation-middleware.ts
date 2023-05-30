@@ -1,5 +1,11 @@
-import {param} from "express-validator";
+import {Request, Response, NextFunction} from "express";
+import {ObjectId} from "mongodb";
+import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
-export const idValidationMiddleware = [
-    param('id').matches("^[0-9a-fA-F]{24}$")
-]
+export const idValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    if(!ObjectId.isValid(req.params.id))  {
+        return res.sendStatus(HTTP_STATUS.Not_found)
+    } else {
+       return next()
+    }
+}
