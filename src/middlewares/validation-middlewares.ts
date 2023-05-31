@@ -1,7 +1,7 @@
 import {body} from "express-validator";
 import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
-import {ObjectId} from "mongodb";
 const patternUrl = '^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$'
+const patternObjectId = '^[0-9a-fA-F]{24}$'
 
 const loginOrEmailValidationRule = body('loginOrEmail')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
@@ -70,7 +70,7 @@ const blogIdValidationRule = body('blogId')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
-    .custom(value => !ObjectId.isValid(value)).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
+    .matches(patternObjectId).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
 
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
