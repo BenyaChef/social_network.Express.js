@@ -76,3 +76,4 @@ export const authValidationMiddleware = [loginOrEmailValidationRule, passwordVal
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
 export const blogValidationMiddleware = [nameValidationRule, descriptionValidationRule, websiteUrlValidationRule]
 export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule, blogIdValidationRule]
+export const postByBlogValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule]
