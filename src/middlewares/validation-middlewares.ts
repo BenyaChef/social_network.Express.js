@@ -1,5 +1,8 @@
 import {body} from "express-validator";
 import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
+import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
+import {ObjectId} from "mongodb";
+
 const patternUrl = '^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$'
 const patternObjectId = '^[0-9a-fA-F]{24}$'
 
@@ -9,11 +12,11 @@ const loginOrEmailValidationRule = body('loginOrEmail')
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
 
 
-const passwordValidationRule =  body('password')
+const passwordValidationRule = body('password')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
-    .isLength({min:6, max: 20}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
+    .isLength({min: 6, max: 20}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
 
 const loginValidationRule = body('login')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
@@ -71,6 +74,14 @@ const blogIdValidationRule = body('blogId')
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
     .matches(patternObjectId).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
+    .custom(async value => {
+        if (ObjectId.isValid(value)) {
+            const isFind = await blogsQueryRepository.findBlogByID(value)
+            if (!isFind) {
+                throw new Error(ERRORS_MESSAGE.NOT_FOUND)
+            }
+        }
+    })
 
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]

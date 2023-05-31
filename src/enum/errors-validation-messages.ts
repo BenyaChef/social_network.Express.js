@@ -3,5 +3,6 @@ export enum ERRORS_MESSAGE {
     IS_STRING = 'input must by string',
     IS_LENGTH = 'input length incorrect',
     PATTERN_INCORRECT = 'unacceptable symbols',
-    SPACES_FIELD = 'field cannot be all spaces'
+    SPACES_FIELD = 'field cannot be all spaces',
+    NOT_FOUND = 'blog is not found'
 }
