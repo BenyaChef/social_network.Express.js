@@ -1,5 +1,6 @@
 import {body} from "express-validator";
 import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
+import {ObjectId} from "mongodb";
 const patternUrl = '^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$'
 
 const loginOrEmailValidationRule = body('loginOrEmail')
@@ -65,7 +66,13 @@ const contentValidationRule = body('content')
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
     .isLength({min: 3, max: 1000}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
 
+const blogIdValidationRule = body('blogId')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+    .custom(value => ObjectId.isValid(value)).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
+
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
 export const blogValidationMiddleware = [nameValidationRule, descriptionValidationRule, websiteUrlValidationRule]
-export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule]
+export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule, blogIdValidationRule]
