@@ -70,7 +70,7 @@ const blogIdValidationRule = body('blogId')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
-    .custom(value => ObjectId.isValid(value)).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
+    .custom(value => !ObjectId.isValid(value)).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
 
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
