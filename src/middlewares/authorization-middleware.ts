@@ -10,3 +10,11 @@ export const authorizationMiddleware = (req: Request, res: Response, next: NextF
     } else next()
 
 }
+
+export const authJWTTokenMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization
+    if(!token) {
+        res.sendStatus(HTTP_STATUS.Unauthorized)
+    }
+    next()
+}

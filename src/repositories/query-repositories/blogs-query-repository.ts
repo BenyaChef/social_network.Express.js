@@ -38,8 +38,7 @@ export const blogsQueryRepository = {
             page: +pageNumber,
             pageSize: +pageSize,
             totalCount: totalCount,
-            items: arrBlogs.map(blog => mapBlogs(blog))
-            //items: arrBlogs.map(mapBlogs) [1,2,3,4,5].map(el => String(el))
+            items: arrBlogs.map(mapBlogs)
         }
     },
 

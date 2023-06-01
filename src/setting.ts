@@ -9,7 +9,9 @@ export const app = express()
 app.use(express.json())
 
 app.use('/testing', testRouter)
+
 app.use('/blogs', blogRouter)
 app.use('/posts', postRouter)
-app.use('/auth', loginRouter)
 app.use('/users', routerUsers)
+
+app.use('/auth', loginRouter)

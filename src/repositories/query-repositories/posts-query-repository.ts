@@ -37,7 +37,7 @@ export const postsQueryRepository = {
                 page: +pageNumber,
                 pageSize: +pageSize,
                 totalCount: totalCount,
-                items: arrPosts.map(post => mapPosts(post))
+                items: arrPosts.map(mapPosts)
             }
 
     },
@@ -65,7 +65,7 @@ export const postsQueryRepository = {
             page: +pageNumber,
             pageSize: +pageSize,
             totalCount: totalCount,
-            items: arrPosts.map(post => mapPosts(post))
+            items: arrPosts.map(mapPosts)
         }
     },
 
@@ -81,16 +81,6 @@ export const postsQueryRepository = {
 
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
         const skipPage = (pageNumber - 1) * pageSize
-
-        const obj ={
-            '4': 'hello',
-
-        }
-        // @ts-ignore
-        obj[ 2 + 2]
-
-
-
         const filter = field !== undefined ? {[field]: value} : {}
         const totalCount = await postsCollections.countDocuments(filter)
         const pagesCount = Math.ceil(totalCount / pageSize)

@@ -39,7 +39,7 @@ export const usersQueryRepository = {
             page: +pageNumber,
             pageSize: +pageSize,
             totalCount: totalCount,
-            items: arrUsers.map(user => mapUsers(user))
+            items: arrUsers.map(mapUsers)
         }
     },
 
