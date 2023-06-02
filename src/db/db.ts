@@ -3,13 +3,10 @@ import dotenv from "dotenv";
 import {BlogModel} from "../models/blogs-models/blog-model";
 import {PostModel} from "../models/posts-models/PostModel";
 import {UsersDBModel} from "../models/users-model/users-db-model";
+import {settings} from "../../settings";
 dotenv.config()
 
-const mongoURI = process.env.MONGO_URL
-
-if(!mongoURI) {
-    throw new Error('mongoUri not found!')
-}
+const mongoURI = settings.MONGO_URI
 
 const client = new MongoClient(mongoURI)
 const DB = client.db()

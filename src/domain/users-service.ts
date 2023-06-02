@@ -22,11 +22,14 @@ export const usersService = {
 
     },
 
-    async checkCredentials(body: LoginInputModel): Promise<boolean> {
+    async checkCredentials(body: LoginInputModel): Promise<UsersDBModel | null> {
         const user: UsersDBModel | null = await usersRepository.findUserLoginOrEmail(body)
-        if (!user) return false
-        return await bcrypt.compare(body.password, user.password)
+        if (!user) return null
+        const encodingUser = await bcrypt.compare(body.password, user.password)
+        if(!encodingUser) return null
+        return user
     },
+
 
    async deleteUsersById(id: string) : Promise<boolean> {
         return await usersRepository.deleteUsersById(id)
