@@ -2,7 +2,7 @@ import {BlogModel} from "../../models/blogs-models/blog-model";
 import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
 
 
-export function mapBlogs(blog: BlogModel): BlogViewModel {
+export const mapBlogs = (blog: BlogModel): BlogViewModel => {
     return {
         id: blog._id.toString(),
         name: blog.name,

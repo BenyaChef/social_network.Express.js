@@ -7,10 +7,20 @@ import {UsersDBModel} from "../../models/users-model/users-db-model";
 import {mapUsers} from "../../utils/helpers/map-users";
 import {UserViewModel} from "../../models/users-model/user-view-model";
 import {ObjectId} from "mongodb";
+import {MeViewModel} from "../../models/users-model/me-view-model";
+import {mapMeUser} from "../../utils/map-me-user";
 
 export const usersQueryRepository = {
 
-    async findUserById(id: string) : Promise<UserViewModel | null> {
+    async getUserByIdByToken(id: ObjectId) : Promise<MeViewModel | null> {
+        const findUser = await usersCollections.findOne({_id: id})
+        if(!findUser) {
+            return null
+        }
+        return mapMeUser(findUser)
+    },
+
+    async findUserById(id: string | ObjectId) : Promise<UserViewModel | null> {
         const isFind = await usersCollections.findOne({_id: new ObjectId(id)})
         if(!isFind) {
             return null

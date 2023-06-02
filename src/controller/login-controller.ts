@@ -5,6 +5,9 @@ import {usersService} from "../domain/users-service";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {UsersDBModel} from "../models/users-model/users-db-model";
 import {jwtService} from "../application/jwt-service";
+import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {MeViewModel} from "../models/users-model/me-view-model";
+
 
 export const loginController = {
 
@@ -13,12 +16,15 @@ export const loginController = {
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const token = await jwtService.createJWT(user._id)
-        return res.send(token)
+        const token = await jwtService.createJWT(user)
+        return res.status(HTTP_STATUS.OK).send(token)
     },
 
     async getAuthUser(req: Request, res: Response) {
-
-
+        const user: MeViewModel | null = await usersQueryRepository.getUserByIdByToken(req.userId!)
+        if(!user) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        return res.status(HTTP_STATUS.OK).send(user)
     }
 }

@@ -83,8 +83,15 @@ const blogIdValidationRule = body('blogId')
         }
     })
 
+const commentsValidationRule = body('content')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+    .isLength({min: 20 , max: 300}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
+
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
 export const blogValidationMiddleware = [nameValidationRule, descriptionValidationRule, websiteUrlValidationRule]
 export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule, blogIdValidationRule]
 export const postByBlogValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule]
+export const commentsValidationMiddleware = [commentsValidationRule]

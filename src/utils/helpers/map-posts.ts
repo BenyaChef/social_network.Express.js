@@ -1,7 +1,7 @@
 import {PostModel} from "../../models/posts-models/PostModel";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
 
-export function mapPosts(post: PostModel) : PostViewModel {
+export const mapPosts = (post: PostModel) : PostViewModel => {
     return {
         id: post._id.toString(),
         title: post.title,

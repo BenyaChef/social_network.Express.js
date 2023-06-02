@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {Request, Response} from "express";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {postsService} from "../domain/posts-service";
@@ -15,6 +15,7 @@ import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-so
 import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 import {Errors} from "../enum/errors";
 import {ErrorsMessages} from "../enum/errors-message";
+import {commentsService} from "../domain/comments-service";
 
 export const postsController = {
 

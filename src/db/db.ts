@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import {BlogModel} from "../models/blogs-models/blog-model";
 import {PostModel} from "../models/posts-models/PostModel";
 import {UsersDBModel} from "../models/users-model/users-db-model";
-import {settings} from "../../settings";
+import {settings} from "../settings";
+import {CommentDbModel} from "../models/comment-models/comment-db-model";
 dotenv.config()
 
 const mongoURI = settings.MONGO_URI
@@ -13,7 +14,7 @@ const DB = client.db()
 export const blogsCollections = DB.collection<BlogModel>('blogs')
 export const postsCollections = DB.collection<PostModel>('posts')
 export const usersCollections = DB.collection<UsersDBModel>('users')
-export const commentCollections = DB.collection('comments')
+export const commentCollections = DB.collection<CommentDbModel>('comments')
 
 export async function runDB() {
     try {

@@ -6,6 +6,12 @@ import {DeleteResult, ObjectId} from "mongodb";
 
 export const usersRepository = {
 
+    async findUserById(id: ObjectId) : Promise<ObjectId | null> {
+        const findUser = await usersCollections.findOne({_id: id})
+        if(!findUser) return null
+        return findUser._id
+    },
+
     async findUserLoginOrEmail(body: LoginInputModel): Promise<UsersDBModel | null> {
         return await usersCollections.findOne({$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]})
     },

@@ -7,6 +7,10 @@ import {LoginInputModel} from "../models/login-models/login-input-model";
 
 export const usersService = {
 
+    async getUserById(id: ObjectId) : Promise<ObjectId | null>{
+        return await usersRepository.findUserById(id)
+    },
+
     async createUser(body: UserInputModel): Promise<ObjectId> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(body.password, passwordSalt)
