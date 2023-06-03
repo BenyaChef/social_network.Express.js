@@ -2,8 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../domain/users-service";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import {ObjectId} from "mongodb";
+
 
 export const authorizationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const basic64 = Buffer.from('admin:qwerty').toString('base64')

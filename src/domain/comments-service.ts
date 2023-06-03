@@ -4,6 +4,9 @@ import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {commentsRepository} from "../repositories/comments-repository";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
+import {resultCodeMap} from "../utils/helpers/result-code";
+import {Errors} from "../enum/errors";
+import {ResultCodeHandler} from "../models/result-code-handler";
 
 export const commentsService = {
 
@@ -26,5 +29,21 @@ export const commentsService = {
             postId: post.id
         }
         return await commentsRepository.createNewComment(newComment)
+    },
+
+    async updateComments(body: InputCommentModel, userId: ObjectId, commentId: string) : Promise<ResultCodeHandler<null>> {
+            const findComment = await commentsRepository.findCommentById(commentId)
+        if(!findComment) {
+            return resultCodeMap(false, null, Errors.Not_Found)
+        }
+        if(userId.toString() !== findComment.commentatorInfo.userId) {
+            return resultCodeMap(false, null, Errors.Forbidden)
+        }
+        const updateComment = {content: body.content}
+        const resultUpdate = await commentsRepository.updateCommentById(updateComment, commentId)
+        if(!resultUpdate) {
+            return resultCodeMap(false, null, Errors.Error_Server)
+        }
+        return resultCodeMap(true, null)
     }
 }

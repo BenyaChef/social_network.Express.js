@@ -15,7 +15,6 @@ import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-so
 import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 import {Errors} from "../enum/errors";
 import {ErrorsMessages} from "../enum/errors-message";
-import {commentsService} from "../domain/comments-service";
 
 export const postsController = {
 

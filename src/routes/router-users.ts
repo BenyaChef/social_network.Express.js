@@ -4,18 +4,18 @@ import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {userValidationMiddleware} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 
-export const routerUsers = Router({})
+export const usersRouter = Router({})
 
-routerUsers.get('/',
+usersRouter.get('/',
     authorizationMiddleware,
     usersController.getAllUsers)
 
-routerUsers.post('/',
+usersRouter.post('/',
     authorizationMiddleware,
     userValidationMiddleware,
     inputValidationMiddleware,
     usersController.createUser)
 
-routerUsers.delete('/:id',
+usersRouter.delete('/:id',
     authorizationMiddleware,
     usersController.deleteUsersById)

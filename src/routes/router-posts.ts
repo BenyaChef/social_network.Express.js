@@ -4,7 +4,7 @@ import {inputValidationMiddleware} from "../middlewares/input-validation-middlew
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {postsController} from "../controller/posts-controller";
 import {commentsValidationMiddleware, postValidationMiddleware} from "../middlewares/validation-middlewares";
-import {commentController} from "../controller/comment-conroller";
+import {commentController} from "../controller/comment-controller";
 
 export const postRouter = Router({})
 
