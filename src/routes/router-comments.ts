@@ -7,9 +7,18 @@ import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 
 export const commentsRouter = Router({})
 
+commentsRouter.get(':id',
+    idValidationMiddleware,
+    commentController.getCommentById)
+
 commentsRouter.put('/:id',
     authJWTMiddleware,
     idValidationMiddleware,
     commentsValidationMiddleware,
     inputValidationMiddleware,
     commentController.updateCommentById)
+
+commentsRouter.delete('/id',
+    authJWTMiddleware,
+    idValidationMiddleware,
+    commentController.deleteCommentByID)

@@ -45,5 +45,20 @@ export const commentsService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
+    },
+
+    async deleteComment(id: string, userId: ObjectId) : Promise<ResultCodeHandler<null>> {
+        const findComment = await commentsRepository.findCommentById(id)
+        if(!findComment) {
+            return resultCodeMap(false, null, Errors.Not_Found)
+        }
+        if(userId.toString() !== findComment.commentatorInfo.userId) {
+            return resultCodeMap(false, null, Errors.Forbidden)
+        }
+        const resultDelete = commentsRepository.deleteComment(findComment._id!)
+        if(!resultDelete) {
+            return resultCodeMap(false, null, Errors.Error_Server)
+        }
+        return resultCodeMap(true, null)
     }
 }
