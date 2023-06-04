@@ -18,15 +18,15 @@ export const commentsQueryRepository = {
         return mapComment(findComment)
     },
 
-    async findAllCommentByPostId(query: CommentPaginationModel, id: string) : Promise<CommentPaginationViewModel | null> {
+    async findAllCommentByPostId(query: CommentPaginationModel, postId: string) : Promise<CommentPaginationViewModel | null> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
         const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
-        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize)
+        const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, postId, SortByEnum.postId)
         const {skipPage, pagesCount, totalCount} = processingResult
 
         const commentsArray: CommentDbModel[] = await commentCollections
-            .find({postId: id})
+            .find({postId: postId})
             .sort({[sortBy]: sortDirection})
             .limit(+pageSize)
             .skip(skipPage)
@@ -57,7 +57,7 @@ export const commentsQueryRepository = {
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
         const skipPage = (pageNumber - 1) * pageSize
         const filter = field !== undefined ? {[field]: value} : {}
-        const totalCount = await postsCollections.countDocuments(filter)
+        const totalCount = await commentCollections.countDocuments(filter)
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
             skipPage,

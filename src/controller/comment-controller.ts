@@ -31,7 +31,6 @@ export const commentController = {
     async createNewComment(req: Request, res: Response) {
         const newCommentId: ObjectId | null = await commentsService.createNewComment(req.body, req.userId!, req.params.id)
         if (!newCommentId) {
-            console.log(newCommentId)
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         const newComment = await commentsQueryRepository.findCommentById(newCommentId)

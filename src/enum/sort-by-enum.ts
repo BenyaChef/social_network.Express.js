@@ -1,4 +1,5 @@
 export enum SortByEnum {
     createdAt = 'createdAt',
-    blogId = 'blogId'
+    blogId = 'blogId',
+    postId = 'postId'
 }
