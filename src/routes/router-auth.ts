@@ -6,11 +6,12 @@ import {authJWTMiddleware} from "../middlewares/authorization-middleware";
 
 export const loginRouter = Router({})
 
+loginRouter.get('/me',
+    authJWTMiddleware,
+    loginController.getAuthUser)
+
 loginRouter.post('/login',
     authValidationMiddleware,
     inputValidationMiddleware,
     loginController.loginUser)
 
-loginRouter.get('/me',
-    authJWTMiddleware,
-    loginController.getAuthUser)

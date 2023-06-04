@@ -9,8 +9,17 @@ import {UserViewModel} from "../../models/users-model/user-view-model";
 import {ObjectId} from "mongodb";
 import {MeViewModel} from "../../models/users-model/me-view-model";
 import {mapMeUser} from "../../utils/map-me-user";
+import {UserInputModel} from "../../models/users-model/user-input-model";
 
 export const usersQueryRepository = {
+
+   async userByEmail(body: UserInputModel) : Promise<UsersDBModel | null> {
+        const findUser = await usersCollections.findOne({email: body.email})
+       if(!findUser) {
+           return null
+       }
+       return findUser
+    },
 
     async getUserByIdByToken(id: ObjectId) : Promise<MeViewModel | null> {
         const findUser = await usersCollections.findOne({_id: id})

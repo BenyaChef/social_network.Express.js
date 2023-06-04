@@ -1,6 +1,5 @@
 export interface UserInputModel {
-    email
-        : string
+    email: string
     password: string
     login: string
 }
