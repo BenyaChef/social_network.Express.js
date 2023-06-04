@@ -7,6 +7,7 @@ import {postsQueryRepository} from "../repositories/query-repositories/posts-que
 import {resultCodeMap} from "../utils/helpers/result-code";
 import {Errors} from "../enum/errors";
 import {ResultCodeHandler} from "../models/result-code-handler";
+import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 
 export const commentsService = {
 
@@ -48,14 +49,14 @@ export const commentsService = {
     },
 
     async deleteComment(id: string, userId: ObjectId) : Promise<ResultCodeHandler<null>> {
-        const findComment = await commentsRepository.findCommentById(id)
+        const findComment = await commentsQueryRepository.findCommentById(id)
         if(!findComment) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
         if(userId.toString() !== findComment.commentatorInfo.userId) {
             return resultCodeMap(false, null, Errors.Forbidden)
         }
-        const resultDelete = commentsRepository.deleteComment(findComment._id!)
+        const resultDelete = commentsRepository.deleteComment(findComment.id!)
         if(!resultDelete) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }

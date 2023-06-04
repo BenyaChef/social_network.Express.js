@@ -10,7 +10,7 @@ import {CommentPaginationViewModel} from "../../models/comment-models/comment-pa
 
 export const commentsQueryRepository = {
 
-    async findCommentById(id: ObjectId) : Promise<CommentViewModel | null> {
+    async findCommentById(id: ObjectId | string) : Promise<CommentViewModel | null> {
         const findComment = await commentCollections.findOne({_id: new ObjectId(id)})
         if (!findComment) {
             return null

@@ -18,7 +18,7 @@ commentsRouter.put('/:id',
     inputValidationMiddleware,
     commentController.updateCommentById)
 
-commentsRouter.delete('/id',
+commentsRouter.delete('/:id',
     authJWTMiddleware,
     idValidationMiddleware,
     commentController.deleteCommentByID)
