@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {commentCollections, postsCollections} from "../../db/db";
+import {commentCollections} from "../../db/db";
 import {mapComment} from "../../utils/helpers/map-comment";
 import {CommentViewModel} from "../../models/comment-models/comment-view-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
@@ -11,7 +11,7 @@ import {CommentPaginationViewModel} from "../../models/comment-models/comment-pa
 export const commentsQueryRepository = {
 
     async findCommentById(id: ObjectId) : Promise<CommentViewModel | null> {
-        const findComment = await commentCollections.findOne({_id: id})
+        const findComment = await commentCollections.findOne({_id: new ObjectId(id)})
         if (!findComment) {
             return null
         }

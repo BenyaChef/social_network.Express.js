@@ -7,12 +7,13 @@ import {RequestWithParams, RequestWithParamsAndQuery} from "../models/request-mo
 import {CommentPaginationModel} from "../models/request-models/comment-pagination-model";
 import {Errors} from "../enum/errors";
 import {resultCodeHandler} from "../utils/result-code-handler";
+import {CommentViewModel} from "../models/comment-models/comment-view-model";
 
 export const commentController = {
 
     async getCommentById(req: RequestWithParams<{ id: string }>, res: Response) {
         const commentId = new ObjectId(req.params.id)
-        const findComment = await commentsQueryRepository.findCommentById(commentId)
+        const findComment: CommentViewModel | null = await commentsQueryRepository.findCommentById(commentId)
         if(!findComment) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
