@@ -2,8 +2,6 @@ import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../domain/users-service";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import bcrypt from "bcrypt";
 
 
 export const authorizationMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -32,14 +30,3 @@ export const authJWTMiddleware = async (req: Request, res: Response, next: NextF
     return next()
 }
 
-export const checkForAnExistingUser = async (req: Request, res: Response, next: NextFunction) => {
-    const findUser = await usersQueryRepository.userByEmail(req.body)
-    if (findUser) {
-        const encodingUser = await bcrypt.compare(req.body.password, findUser.password)
-        if (encodingUser) {
-            const error = new Error('message: User this user already exists, field: email')
-        }
-    }
-
-
-}

@@ -3,21 +3,28 @@ import {usersCollections} from "../db/db";
 
 import {LoginInputModel} from "../models/login-models/login-input-model";
 import {DeleteResult, ObjectId} from "mongodb";
+import {UserInputModel} from "../models/users-model/user-input-model";
 
 export const usersRepository = {
 
-    async findUserById(id: ObjectId) : Promise<ObjectId | null> {
+    async findUserById(id: ObjectId): Promise<ObjectId | null> {
         const findUser = await usersCollections.findOne({_id: id})
-        if(!findUser) return null
+        if (!findUser) return null
         return findUser._id
     },
 
-    async findUserLoginOrEmail(body: LoginInputModel): Promise<UsersDBModel | null> {
-        return await usersCollections.findOne({$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]})
+    async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<UsersDBModel | null> {
+        let filter = {}
+        if ('loginOrEmail' in body) {
+            filter = {$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]}
+        } else {
+            filter = {$or: [{login: body.login}, {email: body.email}]}
+        }
+        return await usersCollections.findOne(filter)
     },
 
     async createUser(newUser: UsersDBModel): Promise<ObjectId> {
-       const createResult = await usersCollections.insertOne(newUser)
+        const createResult = await usersCollections.insertOne(newUser)
         return createResult.insertedId
     },
 

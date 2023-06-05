@@ -5,6 +5,6 @@ export const mapMeUser = (user: UsersDBModel) : MeViewModel => {
     return {
         email: user.email,
         login: user.login,
-        userId: user._id.toString()
+        userId: user._id!.toString()
     }
 }

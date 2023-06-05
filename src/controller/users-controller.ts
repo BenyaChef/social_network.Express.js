@@ -19,7 +19,7 @@ export const usersController = {
 
    async createUser(req: RequestWithBody<UserInputModel>,
                     res: Response) {
-        const newUserId: ObjectId = await usersService.createUser(req.body)
+        const newUserId: ObjectId = await usersService.createAdminUser(req.body)
 
        const newUser = await usersQueryRepository.findUserById(newUserId.toString())
        if(!newUser) {

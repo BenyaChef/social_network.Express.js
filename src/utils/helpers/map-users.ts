@@ -3,7 +3,7 @@ import {UserViewModel} from "../../models/users-model/user-view-model";
 
 export const mapUsers = (user: UsersDBModel) : UserViewModel => {
     return {
-        id: user._id.toString(),
+        id: user._id!.toString(),
         login: user.login,
         email: user.email,
         createdAt: user.createdAt
