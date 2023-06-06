@@ -16,13 +16,13 @@ export const usersQueryRepository = {
    async userByEmail(body: UserInputModel) : Promise<UsersDBModel | null> {
         const findUser = await usersCollections.findOne({email: body.email})
        if(!findUser) {
-           return null
+           return null 
        }
        return findUser
     },
 
     async getUserByIdByToken(id: ObjectId) : Promise<MeViewModel | null> {
-        const findUser = await usersCollections.findOne({_id: id})
+        const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
         if(!findUser) {
             return null
         }
@@ -30,11 +30,11 @@ export const usersQueryRepository = {
     },
 
     async findUserById(id: string | ObjectId) : Promise<UserViewModel | null> {
-        const isFind = await usersCollections.findOne({_id: new ObjectId(id)})
-        if(!isFind) {
+        const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
+        if(!findUser) {
             return null
         }
-        return mapUsers(isFind)
+        return mapUsers(findUser)
     },
 
     async getAllUsers(query: UsersPaginationSortQueryModel): Promise<UsersViewPaginationSortModel> {
