@@ -2,7 +2,7 @@ export const ErrorsMessages = {
     errorsMessages: [
         {
             message: "user already exists with this data",
-            field: "login or email"
+            field: "email"
         }
     ]
 }

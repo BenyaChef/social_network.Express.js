@@ -63,10 +63,10 @@ export const loginController = {
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
         const resultRegistration = await usersService.createUser(req.body)
         if (resultRegistration.error === Errors.Bad_Request) {
-            return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages.errorsMessages)
+            return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages)
         }
         if (resultRegistration.success) {
-            return res.status(HTTP_STATUS.No_content).json(MessagesEnum.registration)
+            return res.status(HTTP_STATUS.No_content)
         }
         return res.sendStatus(HTTP_STATUS.Server_error)
     },
