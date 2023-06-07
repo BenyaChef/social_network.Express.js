@@ -1,6 +1,10 @@
 import {Router} from "express";
 import {loginController} from "../controller/login-controller";
-import {authValidationMiddleware, userValidationMiddleware} from "../middlewares/validation-middlewares";
+import {
+    authValidationMiddleware,
+    codeValidationMiddleware, emailValidationMiddleware,
+    userValidationMiddleware
+} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {authJWTMiddleware} from "../middlewares/authorization-middleware";
 
@@ -21,4 +25,11 @@ loginRouter.post('/registration',
     loginController.registrationNewUser)
 
 loginRouter.post('/registration-confirmation',
-    loginController.loginUser)
+    codeValidationMiddleware,
+    inputValidationMiddleware,
+    loginController.confirmUser)
+
+loginRouter.post('/registration-email-resending',
+    emailValidationMiddleware,
+    inputValidationMiddleware,
+    loginController.emailResending)

@@ -89,6 +89,13 @@ const commentsValidationRule = body('content')
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
     .isLength({min: 20 , max: 300}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
 
+const codeValidationRule = body('code')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+
+
+
 
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
@@ -96,3 +103,5 @@ export const blogValidationMiddleware = [nameValidationRule, descriptionValidati
 export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule, blogIdValidationRule]
 export const postByBlogValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule]
 export const commentsValidationMiddleware = [commentsValidationRule]
+export const codeValidationMiddleware = [codeValidationRule]
+export const emailValidationMiddleware = [emailValidationRule]

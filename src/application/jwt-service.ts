@@ -1,14 +1,14 @@
 import jwt from 'jsonwebtoken';
 import {settings} from "../settings";
 import {JwtAccessModel} from "../models/jwt-models/jwt-access-model";
-import {UsersDBModel} from "../models/users-model/users-db-model";
+import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {JwtVerifyModel} from "../models/jwt-models/jwt-verify-model";
 import {ObjectId} from "mongodb";
 
 
 export const jwtService = {
 
-    async createJWT(user: UsersDBModel): Promise<JwtAccessModel> {
+    async createJWT(user: AdminDbModel): Promise<JwtAccessModel> {
         const token: string = jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '1h'})
         return {
             accessToken: token

@@ -1,7 +1,7 @@
-import {UsersDBModel} from "../models/users-model/users-db-model";
+import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {MeViewModel} from "../models/users-model/me-view-model";
 
-export const mapMeUser = (user: UsersDBModel) : MeViewModel => {
+export const mapMeUser = (user: AdminDbModel) : MeViewModel => {
     return {
         email: user.email,
         login: user.login,

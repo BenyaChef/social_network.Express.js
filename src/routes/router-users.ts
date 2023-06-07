@@ -14,7 +14,7 @@ usersRouter.post('/',
     authorizationMiddleware,
     userValidationMiddleware,
     inputValidationMiddleware,
-    usersController.createUser)
+    usersController.createAdminUser)
 
 usersRouter.delete('/:id',
     authorizationMiddleware,

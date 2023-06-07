@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {blogsCollections, commentCollections, postsCollections, usersCollections} from "../db/db";
+import {blogsCollections, commentCollections, emailCollections, postsCollections, usersCollections} from "../db/db";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
 
@@ -10,7 +10,8 @@ testRouter.delete('/all-data', async (req: Request, res: Response) => {
         blogsCollections.deleteMany({}),
         postsCollections.deleteMany({}),
         usersCollections.deleteMany({}),
-        commentCollections.deleteMany({})
+        commentCollections.deleteMany({}),
+        emailCollections.deleteMany({})
     ]).catch((error) => {
             console.log(error)
             return res.sendStatus(HTTP_STATUS.Server_error)

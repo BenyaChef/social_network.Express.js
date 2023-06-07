@@ -16,7 +16,7 @@ export const usersController = {
         res.status(HTTP_STATUS.OK).send(await usersQueryRepository.getAllUsers(req.query))
     },
 
-    async createUser(req: RequestWithBody<UserInputModel>,
+    async createAdminUser(req: RequestWithBody<UserInputModel>,
                      res: Response) {
         const newUserId: ObjectId = await usersService.createAdminUser(req.body)
 

@@ -1,10 +1,11 @@
 import nodemailer from 'nodemailer'
 import {UserInputModel} from "../models/users-model/user-input-model";
+import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
 
 
 export const emailAdapter = {
 
-    async sendEmail(body: UserInputModel) : Promise<boolean> {
+    async sendEmail(inputData: UserInputModel | EmailConfirmationModel, code: string) : Promise<boolean> {
         let transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -14,9 +15,9 @@ export const emailAdapter = {
         });
         let info = await transport.sendMail({
             from: 'Maxim <test.api.incub@gmail.com>',
-            to: body.email,
+            to: inputData.email,
             subject: 'Back-end Lessons,',
-            html:  'https://somesite.com/confirm-email?code=your_confirmation_code'
+            html:  `https://somesite.com/confirm-email?code=${code}`
         })
         return info.accepted.length > 0;
     }
