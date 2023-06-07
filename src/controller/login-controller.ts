@@ -79,3 +79,4 @@ export const loginController = {
         return res.status(HTTP_STATUS.OK).send(user)
     }
 }
+
