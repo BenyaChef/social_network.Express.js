@@ -66,7 +66,7 @@ export const loginController = {
             return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages)
         }
         if (resultRegistration.success) {
-            return res.status(HTTP_STATUS.No_content)
+            return res.sendStatus(HTTP_STATUS.No_content).send('email sent')
         }
         return res.sendStatus(HTTP_STATUS.Server_error)
     },
