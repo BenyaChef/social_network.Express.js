@@ -29,7 +29,16 @@ export const EmailConfirmed = {
     errorsMessages: [
         {
             message: "email confirmed",
-            field: "isConfirmed"
+            field: "email"
+        }
+    ]
+}
+
+export const EmailNotFound = {
+    errorsMessages: [
+        {
+            message: "email no found",
+            field: "email"
         }
     ]
 }

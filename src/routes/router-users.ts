@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {usersController} from "../controller/users-controller";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
-import {userValidationMiddleware} from "../middlewares/validation-middlewares";
+import {userAdminValidationMiddleware} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 
 export const usersRouter = Router({})
@@ -12,7 +12,7 @@ usersRouter.get('/',
 
 usersRouter.post('/',
     authorizationMiddleware,
-    userValidationMiddleware,
+    userAdminValidationMiddleware,
     inputValidationMiddleware,
     usersController.createAdminUser)
 

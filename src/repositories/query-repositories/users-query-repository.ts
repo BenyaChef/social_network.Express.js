@@ -19,6 +19,10 @@ export const usersQueryRepository = {
         return await emailCollections.findOne({email: body.email})
     },
 
+    async findUserEmailOrLogin(loginOrEmail: string) {
+        return await usersCollections.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
+    },
+
     async getUserByIdByToken(id: ObjectId): Promise<MeViewModel | null> {
         const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
         if (!findUser) {

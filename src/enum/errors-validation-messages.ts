@@ -4,5 +4,6 @@ export enum ERRORS_MESSAGE {
     IS_LENGTH = 'input length incorrect',
     PATTERN_INCORRECT = 'unacceptable symbols',
     SPACES_FIELD = 'field cannot be all spaces',
-    NOT_FOUND = 'blog is not found'
+    NOT_FOUND = 'is not found',
+    FOUND = 'this user exist'
 }

@@ -5,7 +5,7 @@ import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmatio
 
 export const emailAdapter = {
 
-    async sendEmail(inputData: UserInputModel | EmailConfirmationModel, code: string) : Promise<boolean> {
+    async sendEmail(inputData: UserInputModel | EmailConfirmationModel, code: string): Promise<boolean> {
         let transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -17,7 +17,10 @@ export const emailAdapter = {
             from: 'Maxim <test.api.incub@gmail.com>',
             to: inputData.email,
             subject: 'Back-end Lessons,',
-            html:  `https://somesite.com/confirm-email?code=${code}`
+            html: ` <h1>Thank for your registration</h1>
+                    <p>To finish registration please follow the link below:
+                    <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
+                    </p>`
         })
         return info.accepted.length > 0;
     }

@@ -10,10 +10,9 @@ import {MeViewModel} from "../models/users-model/me-view-model";
 import {Errors} from "../enum/errors";
 import {
     CodeIncorrectMessage,
-    EmailConfirmed,
+    EmailConfirmed, EmailNotFound,
     ErrorsMessages,
     ExpiredCodeMessage,
-    MessagesEnum
 } from "../enum/errors-message";
 import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
@@ -24,14 +23,14 @@ export const loginController = {
 
     async emailResending(req: RequestWithBody<EmailResending>, res: Response) {
         const resendingResult = await usersService.emailResending(req.body)
-        if(resendingResult.error === Errors.Error_Server) {
-            return res.sendStatus(HTTP_STATUS.Server_error)
-        }
         if(resendingResult.error === Errors.Not_Found) {
-            return res.sendStatus(HTTP_STATUS.Not_found)
+            return res.status(HTTP_STATUS.Bad_request).send(EmailNotFound)
         }
         if(resendingResult.error === Errors.Is_Confirmed) {
-            return res.status(HTTP_STATUS.Bad_request).send(EmailConfirmed.errorsMessages)
+            return res.status(HTTP_STATUS.Bad_request).send(EmailConfirmed)
+        }
+        if(resendingResult.error === Errors.Error_Server) {
+            return res.status(HTTP_STATUS.Server_error)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
     },
@@ -39,15 +38,15 @@ export const loginController = {
     async confirmUser(req: RequestWithBody<CodeConfirmModel>, res: Response) {
         const isConfirm = await usersService.confirmUser(req.body)
         if (isConfirm.error === Errors.Code_No_Valid) {
-            return res.status(HTTP_STATUS.Bad_request).json(CodeIncorrectMessage.errorsMessages)
+            return res.status(HTTP_STATUS.Bad_request).json(CodeIncorrectMessage)
         }
         if (isConfirm.error === Errors.Expiration_Date) {
-            return res.status(HTTP_STATUS.Bad_request).json(ExpiredCodeMessage.errorsMessages)
+            return res.status(HTTP_STATUS.Bad_request).json(ExpiredCodeMessage)
         }
         if (isConfirm.error === Errors.Is_Confirmed) {
-            return res.status(HTTP_STATUS.Bad_request).json(EmailConfirmed.errorsMessages)
+            return res.status(HTTP_STATUS.Bad_request).json(EmailConfirmed)
         }
-        return res.status(HTTP_STATUS.No_content).send(MessagesEnum.verified)
+        return res.sendStatus(HTTP_STATUS.No_content)
 
     },
 
@@ -66,7 +65,7 @@ export const loginController = {
             return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages)
         }
         if (resultRegistration.success) {
-            return res.sendStatus(HTTP_STATUS.No_content).send('email sent')
+            return res.sendStatus(HTTP_STATUS.No_content)
         }
         return res.sendStatus(HTTP_STATUS.Server_error)
     },
