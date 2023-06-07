@@ -29,7 +29,7 @@ const emailValidationRule = body('email')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
-    .isLength({min: 6, max: 20}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
+    .isLength({min: 6, max: 30}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
     .isEmail().withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
 
 const nameValidationRule = body('name')
