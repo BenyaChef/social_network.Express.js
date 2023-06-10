@@ -7,6 +7,7 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {UsersPaginationSortQueryModel} from "../models/request-models/users-pagination-sort-model";
 import {UsersViewPaginationSortModel} from "../models/users-model/users-view-pagination-sort-model";
 import {ObjectId} from "mongodb";
+import {mapUsers} from "../utils/helpers/map-users";
 
 
 export const usersController = {
@@ -20,11 +21,11 @@ export const usersController = {
                      res: Response) {
         const newUserId: ObjectId = await usersService.createAdminUser(req.body)
 
-        const newUser = await usersQueryRepository.findUserById(newUserId.toString())
+        const newUser = await usersQueryRepository.findUserById(newUserId)
         if (!newUser) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
-        return res.status(HTTP_STATUS.Created).send(newUser)
+        return res.status(HTTP_STATUS.Created).send(mapUsers(newUser))
     },
 
     async deleteUsersById(req: RequestWithParams<{ id: string }>,

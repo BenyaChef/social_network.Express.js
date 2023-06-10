@@ -6,7 +6,6 @@ import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import {MeViewModel} from "../models/users-model/me-view-model";
 import {Errors} from "../enum/errors";
 import {
     CodeIncorrectMessage,
@@ -17,6 +16,7 @@ import {
 import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
+import {mapAuthUser} from "../utils/map-me-user";
 
 
 export const loginController = {
@@ -71,11 +71,11 @@ export const loginController = {
     },
 
     async getAuthUser(req: Request, res: Response) {
-        const user: MeViewModel | null = await usersQueryRepository.getUserByIdByToken(req.userId!)
+        const user: AdminDbModel | null = await usersQueryRepository.findUserById(req.userId!)
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        return res.status(HTTP_STATUS.OK).send(user)
+        return res.status(HTTP_STATUS.OK).send(mapAuthUser(user))
     }
 }
 

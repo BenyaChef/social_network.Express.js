@@ -5,10 +5,7 @@ import {SortDirectionEnum} from "../../enum/sort-direction";
 import {emailCollections, usersCollections} from "../../db/db";
 import {AdminDbModel} from "../../models/users-model/admin-db-model";
 import {mapUsers} from "../../utils/helpers/map-users";
-import {UserViewModel} from "../../models/users-model/user-view-model";
 import {ObjectId} from "mongodb";
-import {MeViewModel} from "../../models/users-model/me-view-model";
-import {mapMeUser} from "../../utils/map-me-user";
 import {EmailResending} from "../../models/email-model.ts/email-confirmation-model";
 import {LoginInputModel} from "../../models/login-models/login-input-model";
 import {UserInputModel} from "../../models/users-model/user-input-model";
@@ -31,20 +28,12 @@ export const usersQueryRepository = {
         return await usersCollections.findOne(filter)
     },
 
-    async getUserByIdByToken(id: ObjectId): Promise<MeViewModel | null> {
+    async findUserById(id: ObjectId): Promise<AdminDbModel | null> {
         const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
         if (!findUser) {
             return null
         }
-        return mapMeUser(findUser)
-    },
-
-    async findUserById(id: string | ObjectId): Promise<UserViewModel | null> {
-        const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
-        if (!findUser) {
-            return null
-        }
-        return mapUsers(findUser)
+        return findUser
     },
 
     async getAllUsers(query: UsersPaginationSortQueryModel): Promise<UsersViewPaginationSortModel> {

@@ -12,7 +12,7 @@ import {commentsQueryRepository} from "../repositories/query-repositories/commen
 export const commentsService = {
 
     async createNewComment(body: InputCommentModel, userId: ObjectId, postId: string) : Promise<ObjectId | null> {
-        const user = await usersQueryRepository.getUserByIdByToken(userId)
+        const user = await usersQueryRepository.findUserById(userId)
         if(!user) {
             return null
         }
@@ -23,7 +23,7 @@ export const commentsService = {
         const newComment: CommentDbModel = {
             content: body.content,
             commentatorInfo: {
-                userId: user.userId,
+                userId: user._id!.toString(),
                 userLogin: user.login
             },
             createdAt: new Date().toISOString(),
