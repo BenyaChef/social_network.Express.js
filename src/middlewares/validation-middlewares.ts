@@ -2,8 +2,8 @@ import {body} from "express-validator";
 import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
 import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {ObjectId} from "mongodb";
-import {usersRepository} from "../repositories/users-repository";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {usersCollections} from "../db/db";
+
 
 const patternUrl = '^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$'
 const patternObjectId = '^[0-9a-fA-F]{24}$'
@@ -103,7 +103,7 @@ const registrationUserEmailValidationRule = body('email')
     .isLength({min: 6, max: 30}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
     .isEmail().withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
     .custom(async email => {
-        const user = await usersQueryRepository.findUserEmailOrLogin(email)
+        const user = await usersCollections.findOne({email: email})
         if(user) {
             throw new Error(ERRORS_MESSAGE.FOUND)
         }
@@ -116,7 +116,7 @@ const registrationUserLoginValidationRule = body('login')
     .isLength({min: 3, max: 10}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
     .matches('^[a-zA-Z0-9_-]*$').withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
     .custom(async login => {
-       const user = await usersQueryRepository.findUserEmailOrLogin(login)
+       const user = await usersCollections.findOne({login: login})
         if(user) {
             throw new Error(ERRORS_MESSAGE.FOUND)
         }

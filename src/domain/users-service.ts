@@ -66,7 +66,7 @@ export const usersService = {
     },
 
     async createUser(body: UserInputModel): Promise<ResultCodeHandler<null>> {
-        const findUser = await usersRepository.findUserLoginOrEmail(body)
+        const findUser = await usersQueryRepository.findUserLoginOrEmail(body)
         if (findUser) {
             return resultCodeMap(false, null, Errors.Bad_Request)
         }
@@ -102,7 +102,7 @@ export const usersService = {
     },
 
     async checkCredentials(body: LoginInputModel): Promise<AdminDbModel | null> {
-        const user: AdminDbModel | null = await usersRepository.findUserLoginOrEmail(body)
+        const user: AdminDbModel | null = await usersQueryRepository.findUserLoginOrEmail(body)
         if (!user) return null
         const encodingUser = await bcrypt.compare(body.password, user.password)
         if (!encodingUser) return null

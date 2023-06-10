@@ -38,15 +38,6 @@ export const usersRepository = {
         return findUser._id
     },
 
-    async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<AdminDbModel | null> {
-        let filter = {}
-        if ('loginOrEmail' in body) {
-            filter = {$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]}
-        } else {
-            filter = {$or: [{login: body.login}, {email: body.email}]}
-        }
-        return await usersCollections.findOne(filter)
-    },
 
     async createUser(newUser: AdminDbModel | UsersDbModel): Promise<ObjectId> {
         if('emailConfirmation' in newUser) {

@@ -10,6 +10,8 @@ import {ObjectId} from "mongodb";
 import {MeViewModel} from "../../models/users-model/me-view-model";
 import {mapMeUser} from "../../utils/map-me-user";
 import {EmailResending} from "../../models/email-model.ts/email-confirmation-model";
+import {LoginInputModel} from "../../models/login-models/login-input-model";
+import {UserInputModel} from "../../models/users-model/user-input-model";
 
 
 
@@ -19,8 +21,14 @@ export const usersQueryRepository = {
         return await emailCollections.findOne({email: body.email})
     },
 
-    async findUserEmailOrLogin(loginOrEmail: string) {
-        return await usersCollections.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
+    async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<AdminDbModel | null> {
+        let filter = {}
+        if ('loginOrEmail' in body) {
+            filter = {$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]}
+        } else {
+            filter = {$or: [{login: body.login}, {email: body.email}]}
+        }
+        return await usersCollections.findOne(filter)
     },
 
     async getUserByIdByToken(id: ObjectId): Promise<MeViewModel | null> {
