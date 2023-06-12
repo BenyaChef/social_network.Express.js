@@ -9,9 +9,11 @@ import {ObjectId} from "mongodb";
 export const jwtService = {
 
     async createJWT(user: AdminDbModel): Promise<JwtAccessModel> {
-        const token: string = jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '1h'})
+        const accessToken: string = jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '10s'})
+        const refreshToken: string = jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '20s'})
         return {
-            accessToken: token
+            accessToken: accessToken,
+            refreshToken: refreshToken
         }
     },
 

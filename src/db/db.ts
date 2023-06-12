@@ -6,6 +6,7 @@ import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {settings} from "../settings";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
+import e from "express";
 dotenv.config()
 
 const mongoURI = settings.MONGO_URI
@@ -17,6 +18,7 @@ export const postsCollections = DB.collection<PostModel>('posts')
 export const usersCollections = DB.collection<AdminDbModel>('users')
 export const commentCollections = DB.collection<CommentDbModel>('comments')
 export const emailCollections = DB.collection<EmailConfirmationModel>('emails')
+export const blackList = DB.collection('black-list')
 
 export async function runDB() {
     try {

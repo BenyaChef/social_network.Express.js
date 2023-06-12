@@ -17,19 +17,20 @@ import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
+import {blackList} from "../db/db";
 
 
 export const loginController = {
 
     async emailResending(req: RequestWithBody<EmailResending>, res: Response) {
         const resendingResult = await usersService.emailResending(req.body)
-        if(resendingResult.error === Errors.Not_Found) {
+        if (resendingResult.error === Errors.Not_Found) {
             return res.status(HTTP_STATUS.Bad_request).send(EmailNotFound)
         }
-        if(resendingResult.error === Errors.Is_Confirmed) {
+        if (resendingResult.error === Errors.Is_Confirmed) {
             return res.status(HTTP_STATUS.Bad_request).send(EmailConfirmed)
         }
-        if(resendingResult.error === Errors.Error_Server) {
+        if (resendingResult.error === Errors.Error_Server) {
             return res.status(HTTP_STATUS.Server_error)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
@@ -51,12 +52,16 @@ export const loginController = {
     },
 
     async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
+
         const user: AdminDbModel | null = await usersService.checkCredentials(req.body)
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const token = await jwtService.createJWT(user)
-        return res.status(HTTP_STATUS.OK).send(token)
+        const tokens = await jwtService.createJWT(user)
+        return res
+            .cookie('refreshToken', tokens.refreshToken, {httpOnly: true, secure: true})
+            .status(HTTP_STATUS.OK)
+            .send({accessToken: tokens.accessToken})
     },
 
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
@@ -76,6 +81,48 @@ export const loginController = {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res.status(HTTP_STATUS.OK).send(mapAuthUser(user))
+    },
+
+    async generatedNewTokens(req: Request, res: Response) {
+        const token = req.cookies.refreshToken
+        if (!token) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        const findToken = await blackList.findOne({token: token})
+        if(findToken) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        const userId = await jwtService.verifyJWT(token)
+        if (!userId) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        const authUser = await usersQueryRepository.findUserById(userId)
+        if (!authUser) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        await blackList.insertOne({token: token})
+        const newTokens = await jwtService.createJWT(authUser)
+        return res
+            .cookie('refreshToken', newTokens.refreshToken, {httpOnly: true, secure: true})
+            .status(HTTP_STATUS.OK)
+            .json({accessToken: newTokens.accessToken})
+    },
+
+    async logoutUser(req: Request, res: Response) {
+        const tokenRefresh = req.cookies.refreshToken
+        if (!tokenRefresh) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        const findToken = await blackList.findOne({token: tokenRefresh})
+        if(findToken) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        const userId = await jwtService.verifyJWT(tokenRefresh)
+        if (!userId) {
+            return res.sendStatus(HTTP_STATUS.Unauthorized)
+        }
+        await blackList.insertOne({token: tokenRefresh})
+        return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
 

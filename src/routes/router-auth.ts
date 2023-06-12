@@ -33,3 +33,9 @@ loginRouter.post('/registration-email-resending',
     emailValidationMiddleware,
     inputValidationMiddleware,
     loginController.emailResending)
+
+loginRouter.post('/refresh-token',
+    loginController.generatedNewTokens)
+
+loginRouter.post('/logout',
+    loginController.logoutUser)
