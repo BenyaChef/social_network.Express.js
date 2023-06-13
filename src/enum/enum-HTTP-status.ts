@@ -6,5 +6,7 @@ export enum HTTP_STATUS {
     Unauthorized = 401,
     Forbidden = 403,
     Not_found = 404,
+    Too_Many_Requests = 429,
     Server_error = 500
+
 }
