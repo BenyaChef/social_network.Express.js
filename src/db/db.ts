@@ -6,7 +6,6 @@ import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {settings} from "../settings";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
-import e from "express";
 import {ApiRequestCountModel} from "../models/request-models/api-request-count-model";
 dotenv.config()
 
@@ -21,6 +20,7 @@ export const commentCollections = DB.collection<CommentDbModel>('comments')
 export const emailCollections = DB.collection<EmailConfirmationModel>('emails')
 export const blackList = DB.collection('black-list')
 export const requestsAPI = DB.collection<ApiRequestCountModel>('api_request')
+export const authDeviceCollections = DB.collection('auth_device')
 
 export async function runDB() {
     try {

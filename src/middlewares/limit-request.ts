@@ -3,7 +3,7 @@ import {ApiRequestCountModel} from "../models/request-models/api-request-count-m
 import {requestsAPI} from "../db/db";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
-export const limitRequest = async (req: Request, res: Response, next: NextFunction) => {
+export const limitRequestMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const reqData: ApiRequestCountModel = {
         ip: req.ip,
         URL: req.originalUrl,

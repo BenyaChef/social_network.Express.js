@@ -18,6 +18,8 @@ import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
 import {blackList} from "../db/db";
+import {devicesController} from "./devices-controller";
+import {devicesService} from "../domain/devices-service";
 
 
 export const loginController = {
@@ -57,11 +59,12 @@ export const loginController = {
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const tokens = await jwtService.createJWT(user)
+        const deviceInfo = await jwtService.createJWT(user)
+
+        await devicesService.loginDevice(deviceInfo, req.headers, req.ip)
         return res
-            .cookie('refreshToken', tokens.refreshToken, {httpOnly: true, secure: true})
-            .status(HTTP_STATUS.OK)
-            .send({accessToken: tokens.accessToken})
+            .cookie('refreshToken', deviceInfo.refreshToken, {httpOnly: true, secure: true})
+            .status(HTTP_STATUS.OK).send({accessToken: deviceInfo.accessToken})
     },
 
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {

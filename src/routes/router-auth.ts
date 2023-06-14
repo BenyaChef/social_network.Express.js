@@ -7,7 +7,7 @@ import {
 } from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {authJWTMiddleware} from "../middlewares/authorization-middleware";
-import {limitRequest} from "../middlewares/limit-request";
+import {limitRequestMiddleware} from "../middlewares/limit-request";
 
 export const loginRouter = Router({})
 
@@ -16,22 +16,25 @@ loginRouter.get('/me',
     loginController.getAuthUser)
 
 loginRouter.post('/login',
-    limitRequest,
+    limitRequestMiddleware,
     authValidationMiddleware,
     inputValidationMiddleware,
     loginController.loginUser)
 
 loginRouter.post('/registration',
+    limitRequestMiddleware,
     userValidationMiddleware,
     inputValidationMiddleware,
     loginController.registrationNewUser)
 
 loginRouter.post('/registration-confirmation',
+    limitRequestMiddleware,
     codeValidationMiddleware,
     inputValidationMiddleware,
     loginController.confirmUser)
 
 loginRouter.post('/registration-email-resending',
+    limitRequestMiddleware,
     emailValidationMiddleware,
     inputValidationMiddleware,
     loginController.emailResending)
