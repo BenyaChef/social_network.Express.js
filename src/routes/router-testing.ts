@@ -1,5 +1,6 @@
 import {Request, Response, Router} from "express";
 import {
+    authDeviceCollections,
     blogsCollections,
     commentCollections,
     emailCollections,
@@ -19,7 +20,8 @@ testRouter.delete('/all-data', async (req: Request, res: Response) => {
         usersCollections.deleteMany({}),
         commentCollections.deleteMany({}),
         emailCollections.deleteMany({}),
-        requestsAPI.deleteMany({})
+        requestsAPI.deleteMany({}),
+        authDeviceCollections.deleteMany({})
     ]).catch((error) => {
             console.log(error)
             return res.sendStatus(HTTP_STATUS.Server_error)

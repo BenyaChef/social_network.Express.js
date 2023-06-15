@@ -18,8 +18,8 @@ import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
 import {blackList} from "../db/db";
-import {devicesController} from "./devices-controller";
 import {devicesService} from "../domain/devices-service";
+
 
 
 export const loginController = {
@@ -54,17 +54,13 @@ export const loginController = {
     },
 
     async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
-
-        const user: AdminDbModel | null = await usersService.checkCredentials(req.body)
-        if (!user) {
+        const resultLogin = await devicesService.loginDevice(req.body, req.headers, req.ip)
+        if(!resultLogin.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const deviceInfo = await jwtService.createJWT(user)
-
-        await devicesService.loginDevice(deviceInfo, req.headers, req.ip)
         return res
-            .cookie('refreshToken', deviceInfo.refreshToken, {httpOnly: true, secure: true})
-            .status(HTTP_STATUS.OK).send({accessToken: deviceInfo.accessToken})
+            .cookie('refreshToken', resultLogin.data.refreshToken, {httpOnly: true, secure: true})
+            .status(HTTP_STATUS.OK).send({accessToken: resultLogin.data.accessToken})
     },
 
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
@@ -91,24 +87,14 @@ export const loginController = {
         if (!token) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const findToken = await blackList.findOne({token: token})
-        if(findToken) {
+        const resultUpdateToken = await devicesService.updateRefreshToken(token)
+        if(!resultUpdateToken.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const userId = await jwtService.verifyJWT(token)
-        if (!userId) {
-            return res.sendStatus(HTTP_STATUS.Unauthorized)
-        }
-        const authUser = await usersQueryRepository.findUserById(userId)
-        if (!authUser) {
-            return res.sendStatus(HTTP_STATUS.Unauthorized)
-        }
-        await blackList.insertOne({token: token})
-        const newTokens = await jwtService.createJWT(authUser)
         return res
-            .cookie('refreshToken', newTokens.refreshToken, {httpOnly: true, secure: true})
+            .cookie('refreshToken', resultUpdateToken.data.refreshToken, {httpOnly: true, secure: true})
             .status(HTTP_STATUS.OK)
-            .json({accessToken: newTokens.accessToken})
+            .send({accessToken: resultUpdateToken.data.accessToken})
     },
 
     async logoutUser(req: Request, res: Response) {

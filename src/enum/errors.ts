@@ -5,5 +5,6 @@ export enum Errors {
     Forbidden,
     Code_No_Valid,
     Expiration_Date,
-    Is_Confirmed
+    Is_Confirmed,
+    Unauthorized
 }
