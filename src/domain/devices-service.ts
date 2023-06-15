@@ -19,7 +19,10 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 export const devicesService = {
 
     async updateRefreshToken(token: string) : Promise<ResultCodeHandler<TokensModel>> {
-        const decodeToken : JwtPayload = await jwtService.decodeToken(token)
+        const decodeToken : JwtPayload | null = await jwtService.decodeToken(token)
+        if (!decodeToken) {
+            return resultCodeMap(false, null, Errors.Unauthorized)
+        }
         const device : DevicesDbModel | null = await deviceRepository.findDeviceByDeviceId(decodeToken.deviceId)
         if (!device) {
             return resultCodeMap(false, null, Errors.Unauthorized)
@@ -35,11 +38,11 @@ export const devicesService = {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
         const newAccessToken = await jwtService.createAccessToken(user)
-        const newRefreshToken = await jwtService.createRefreshToken(device.deviceId)
+        const newRefreshToken = await jwtService.createRefreshToken(device.deviceId, user._id!.toString())
         const decodeNewToken = await jwtService.decodeToken(newRefreshToken)
         const updateDateToken = {
-            issuedAt: decodeNewToken.iat,
-            expiresAt: decodeNewToken.exp
+            issuedAt: decodeNewToken!.iat,
+            expiresAt: decodeNewToken!.exp
         }
 
         const updateResult = await deviceRepository.updateTokenInfo(updateDateToken, device.deviceId)
@@ -61,9 +64,11 @@ export const devicesService = {
         }
         const deviceId = uuidv4()
         const accessToken = await jwtService.createAccessToken(user)
-        const refreshToken = await jwtService.createRefreshToken(deviceId)
+        const refreshToken = await jwtService.createRefreshToken(deviceId, user._id!.toString())
         const tokenDecode = await jwtService.decodeToken(refreshToken)
-
+        if(!tokenDecode) {
+            return resultCodeMap(false, null, Errors.Unauthorized)
+        }
         const newDevice: DevicesDbModel = {
             deviceId: tokenDecode.deviceId,
             title: header["user-agent"] || 'agent undefined',
