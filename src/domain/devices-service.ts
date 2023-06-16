@@ -14,21 +14,21 @@ import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
 import {JwtPayload} from "jsonwebtoken";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-
+import {deviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
 
 export const devicesService = {
 
-    async updateRefreshToken(token: string) : Promise<ResultCodeHandler<TokensModel>> {
-        const decodeToken : JwtPayload | null = await jwtService.decodeToken(token)
+    async updateRefreshToken(token: string): Promise<ResultCodeHandler<TokensModel>> {
+        const decodeToken: JwtPayload | null = await jwtService.decodeToken(token)
         if (!decodeToken) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const device : DevicesDbModel | null = await deviceRepository.findDeviceByDeviceId(decodeToken.deviceId)
+        const device: DevicesDbModel | null = await deviceRepository.findDeviceByDeviceId(decodeToken.deviceId)
         if (!device) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
         const user = await usersQueryRepository.findUserById(new ObjectId(device.userId))
-        if(!user) {
+        if (!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
         if (decodeToken.iat !== device.issuedAt) {
@@ -46,7 +46,7 @@ export const devicesService = {
         }
 
         const updateResult = await deviceRepository.updateTokenInfo(updateDateToken, device.deviceId)
-        if(!updateResult) {
+        if (!updateResult) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         const newTokens = {
@@ -66,7 +66,7 @@ export const devicesService = {
         const accessToken = await jwtService.createAccessToken(user)
         const refreshToken = await jwtService.createRefreshToken(deviceId, user._id!.toString())
         const tokenDecode = await jwtService.decodeToken(refreshToken)
-        if(!tokenDecode) {
+        if (!tokenDecode) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
         const newDevice: DevicesDbModel = {
@@ -85,4 +85,45 @@ export const devicesService = {
         const tokens = {accessToken: accessToken, refreshToken: refreshToken}
         return resultCodeMap(true, tokens)
     },
+
+    async terminateAllOtherSessions(userId: string, deviceId: string) {
+        const findSessions = await deviceQueryRepository.getAllDevicesCurrentUser(userId)
+        if (!findSessions) return false
+
+        for (const session of findSessions) {
+            if (session.deviceId !== deviceId) await deviceRepository.terminateSessions(session.deviceId)
+        }
+        return true
+    },
+
+    async terminateThisSession(deviceId: string, userId: string) {
+        const findSession = await deviceRepository.findDeviceByDeviceId(deviceId)
+        if(!findSession) {
+            return resultCodeMap(false, null, Errors.Not_Found)
+        }
+        if(findSession.userId !== userId) {
+            return resultCodeMap(false, null, Errors.Forbidden)
+        }
+        const resultDelete = await deviceRepository.terminateSessions(deviceId)
+        if(!resultDelete) {
+            return resultCodeMap(false, null, Errors.Error_Server)
+        }
+        return resultCodeMap(true, null)
+    },
+
+    async logoutUser(token: string) {
+        const decodeToken = await jwtService.decodeToken(token)
+        if(!decodeToken) {
+            return resultCodeMap(false, null, Errors.Unauthorized)
+        }
+        const user = await deviceQueryRepository.findDeviceByUserId(decodeToken.userId)
+        if(!user) {
+            return resultCodeMap(false, null, Errors.Unauthorized)
+        }
+        const logoutDevice = await deviceRepository.tokenDecay(decodeToken.deviceId)
+        if(!logoutDevice) {
+            return resultCodeMap(false, null, Errors.Error_Server)
+        }
+        return resultCodeMap(true, null)
+    }
 }

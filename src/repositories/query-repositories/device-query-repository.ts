@@ -1,6 +1,6 @@
 import {authDeviceCollections} from "../../db/db";
 import {devicesMap} from "../../utils/helpers/devices-map";
-;
+
 
 export const deviceQueryRepository = {
 
@@ -9,4 +9,7 @@ export const deviceQueryRepository = {
         return deviceArray.map(devicesMap)
     },
 
+    async findDeviceByUserId(userId: string) {
+        return await authDeviceCollections.findOne({userId: userId})
+    }
 }

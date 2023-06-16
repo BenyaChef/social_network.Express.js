@@ -7,7 +7,7 @@ routerSecurityDevices.get('/devices',
     devicesController.getAllDevicesCurrentUser)
 
 routerSecurityDevices.delete('/devices',
-    devicesController.terminateOtherDeviceSessions)
+    devicesController.terminateAllOtherSessions)
 
 routerSecurityDevices.delete('/devices/:id',
     devicesController.terminateSpecifiedDeviceSession)

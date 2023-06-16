@@ -4,12 +4,12 @@ import {Request, Response} from "express";
 import {usersService} from "../domain/users-service";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
-import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {Errors} from "../enum/errors";
 import {
     CodeIncorrectMessage,
-    EmailConfirmed, EmailNotFound,
+    EmailConfirmed,
+    EmailNotFound,
     ErrorsMessages,
     ExpiredCodeMessage,
 } from "../enum/errors-message";
@@ -17,9 +17,7 @@ import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
-import {blackList} from "../db/db";
 import {devicesService} from "../domain/devices-service";
-
 
 
 export const loginController = {
@@ -55,7 +53,7 @@ export const loginController = {
 
     async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
         const resultLogin = await devicesService.loginDevice(req.body, req.headers, req.ip)
-        if(!resultLogin.data) {
+        if (!resultLogin.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res
@@ -88,7 +86,7 @@ export const loginController = {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         const resultUpdateToken = await devicesService.updateRefreshToken(token)
-        if(!resultUpdateToken.data) {
+        if (!resultUpdateToken.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res
@@ -102,15 +100,10 @@ export const loginController = {
         if (!tokenRefresh) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const findToken = await blackList.findOne({token: tokenRefresh})
-        if(findToken) {
+        const resultLogout = await devicesService.logoutUser(tokenRefresh)
+        if(resultLogout.error === Errors.Unauthorized) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const userId = await jwtService.verifyJWT(tokenRefresh)
-        if (!userId) {
-            return res.sendStatus(HTTP_STATUS.Unauthorized)
-        }
-        await blackList.insertOne({token: tokenRefresh})
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
