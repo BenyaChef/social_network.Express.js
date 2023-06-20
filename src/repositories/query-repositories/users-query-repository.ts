@@ -14,8 +14,16 @@ import {UserInputModel} from "../../models/users-model/user-input-model";
 
 export const usersQueryRepository = {
 
+    async findUserByCode(code: string) {
+        return await usersCollections.findOne({code: code})
+    },
+
     async findUserEmail(body: EmailResending) {
         return await emailCollections.findOne({email: body.email})
+    },
+
+    async findUserByEmail(body: EmailResending) {
+      return await usersCollections.findOne({email: body.email})
     },
 
     async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<AdminDbModel | null> {

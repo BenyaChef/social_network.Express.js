@@ -1,7 +1,7 @@
 import {UserInputModel} from "../models/users-model/user-input-model";
 import bcrypt from 'bcrypt'
 import {AdminDbModel} from "../models/users-model/admin-db-model";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {usersRepository} from "../repositories/users-repository";
 import {LoginInputModel} from "../models/login-models/login-input-model";
 import {emailAdapter} from "../adapters/email-adapter";
@@ -14,16 +14,17 @@ import add from 'date-fns/add'
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
+import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
 
 
 export const usersService = {
 
-    async emailResending(body: EmailResending) : Promise<ResultCodeHandler<null>> {
+    async emailResending(body: EmailResending): Promise<ResultCodeHandler<null>> {
         const findConfirmationData = await usersQueryRepository.findUserEmail(body)
-        if(!findConfirmationData) {
+        if (!findConfirmationData) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
-        if(findConfirmationData.isConfirmed) {
+        if (findConfirmationData.isConfirmed) {
             return resultCodeMap(false, null, Errors.Is_Confirmed)
         }
         const newConfirmationData = {
@@ -34,16 +35,16 @@ export const usersService = {
             confirmationCode: uuidv4()
         }
         const result = await usersRepository.resendingEmail(newConfirmationData)
-        if(!result) return resultCodeMap(false, null, Errors.Error_Server)
+        if (!result) return resultCodeMap(false, null, Errors.Error_Server)
         try {
-            await emailAdapter.sendEmail(findConfirmationData, newConfirmationData.confirmationCode)
+            await emailAdapter.sendEmail(findConfirmationData.email, newConfirmationData.confirmationCode)
         } catch (e) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
     },
 
-    async confirmUser(body: CodeConfirmModel) : Promise<ResultCodeHandler<null>> {
+    async confirmUser(body: CodeConfirmModel): Promise<ResultCodeHandler<null>> {
         return await usersRepository.confirmUser(body)
     },
 
@@ -94,7 +95,7 @@ export const usersService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         const code = newUser.emailConfirmation.confirmationCode
-        const resultSendEmail = await emailAdapter.sendEmail(body, code)
+        const resultSendEmail = await emailAdapter.sendEmail(body.email, code)
         if (!resultSendEmail) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
@@ -113,4 +114,35 @@ export const usersService = {
         return await usersRepository.deleteUsersById(id)
     },
 
+    async passwordRecovery(body: EmailResending): Promise<ResultCodeHandler<null>> {
+        const recoveryCode = uuidv4()
+        const findUser: WithId<AdminDbModel> | null = await usersQueryRepository.findUserByEmail(body)
+        if (!findUser) {
+            return resultCodeMap(false, null, Errors.Not_Found)
+        }
+        try {
+            await emailAdapter.sendPassword(body.email, recoveryCode)
+            await usersRepository.recoveryPassword(findUser._id, recoveryCode)
+            return resultCodeMap(true, null)
+        } catch (e) {
+            return resultCodeMap(false, null, Errors.Error_Server)
+        }
+
+    },
+
+    async setNewPassword(body: RecoveryPasswordModel) {
+        const findUser = await usersQueryRepository.findUserByCode(body.recoveryCode)
+        if(!findUser) return resultCodeMap(false, null, Errors.Not_Found)
+
+        if(findUser.code !== body.recoveryCode) return resultCodeMap(false, null, Errors.Code_No_Valid)
+
+        if(findUser.exp! < new Date()) return resultCodeMap(false, null, Errors.Expiration_Date)
+
+        const newPasswordHash = await generateHash(body.newPassword)
+        const resultUpdatePassword = await usersRepository.updatePassword(findUser._id, newPasswordHash)
+
+        if(!resultUpdatePassword) return resultCodeMap(false, null, Errors.Error_Server)
+
+        return resultCodeMap(true, null)
+    }
 }

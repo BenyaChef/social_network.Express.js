@@ -1,46 +1,58 @@
 import {Router} from "express";
-import {loginController} from "../controller/login-controller";
+import {authController} from "../controller/auth-controller";
 import {
     authValidationMiddleware,
-    codeValidationMiddleware, emailValidationMiddleware,
+    codeValidationMiddleware, emailValidationMiddleware, newPasswordValidationMiddleware,
     userValidationMiddleware
 } from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {authJWTMiddleware} from "../middlewares/authorization-middleware";
 import {limitRequestMiddleware} from "../middlewares/limit-request";
 
-export const loginRouter = Router({})
+export const authRouter = Router({})
 
-loginRouter.get('/me',
+authRouter.get('/me',
     authJWTMiddleware,
-    loginController.getAuthUser)
+    authController.getAuthUser)
 
-loginRouter.post('/login',
+authRouter.post('/login',
     limitRequestMiddleware,
     authValidationMiddleware,
     inputValidationMiddleware,
-    loginController.loginUser)
+    authController.loginUser)
 
-loginRouter.post('/registration',
+authRouter.post('/registration',
     limitRequestMiddleware,
     userValidationMiddleware,
     inputValidationMiddleware,
-    loginController.registrationNewUser)
+    authController.registrationNewUser)
 
-loginRouter.post('/registration-confirmation',
+authRouter.post('/registration-confirmation',
     limitRequestMiddleware,
     codeValidationMiddleware,
     inputValidationMiddleware,
-    loginController.confirmUser)
+    authController.confirmUser)
 
-loginRouter.post('/registration-email-resending',
+authRouter.post('/registration-email-resending',
     limitRequestMiddleware,
     emailValidationMiddleware,
     inputValidationMiddleware,
-    loginController.emailResending)
+    authController.emailResending)
 
-loginRouter.post('/refresh-token',
-    loginController.generatedNewTokens)
+authRouter.post('/refresh-token',
+    authController.generatedNewTokens)
 
-loginRouter.post('/logout',
-    loginController.logoutUser)
+authRouter.post('/logout',
+    authController.logoutUser)
+
+authRouter.post('/password-recovery',
+    limitRequestMiddleware,
+    emailValidationMiddleware,
+    inputValidationMiddleware,
+    authController.passwordRecovery)
+
+authRouter.post('/new-password',
+    limitRequestMiddleware,
+    newPasswordValidationMiddleware,
+    inputValidationMiddleware,
+    authController.setNewPassword)

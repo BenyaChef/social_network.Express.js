@@ -9,8 +9,19 @@ import {resultCodeMap} from "../utils/helpers/result-code";
 import {Errors} from "../enum/errors";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
+import add from "date-fns/add";
+import {min} from "date-fns";
 
 export const usersRepository = {
+
+    async recoveryPassword(id: ObjectId, codeRecovery: string): Promise<boolean> {
+        const recoveryInfo = {
+            code: codeRecovery,
+            exp: add(new Date(), {minutes: 5})
+        }
+       const updateResult = await usersCollections.updateOne({_id: new ObjectId(id)}, {$set: recoveryInfo})
+        return updateResult.matchedCount === 1
+    },
 
     async resendingEmail(newConfirmationData: EmailConfirmationModel) : Promise<boolean> {
         const resultUpdateConfirmData = await emailCollections.updateOne({email: newConfirmationData.email}, {$set: newConfirmationData})
@@ -38,7 +49,6 @@ export const usersRepository = {
         return findUser._id
     },
 
-
     async createUser(newUser: AdminDbModel | UsersDbModel): Promise<ObjectId> {
         if('emailConfirmation' in newUser) {
             const createResult = await usersCollections.insertOne(newUser.accountData)
@@ -57,5 +67,10 @@ export const usersRepository = {
         await emailCollections.deleteOne({email: findUser.email})
         const isDelete: DeleteResult = await usersCollections.deleteOne({_id: new ObjectId(id)})
         return isDelete.deletedCount === 1
-    }
+    },
+
+    async updatePassword(id: ObjectId, newPasswordHash: string) {
+        const resultUpdate = await usersCollections.updateOne({_id: new ObjectId(id)}, {$unset:{code: 1, exp: 1}, $set: {password: newPasswordHash}})
+        return resultUpdate.matchedCount === 1
+    },
 }

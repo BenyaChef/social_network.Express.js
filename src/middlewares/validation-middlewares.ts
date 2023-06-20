@@ -14,7 +14,7 @@ const loginOrEmailValidationRule = body('loginOrEmail')
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
 
 
-const passwordValidationRule = body('password')
+const passwordValidationRule = body('password' || 'newPassword')
     .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
@@ -122,12 +122,26 @@ const registrationUserLoginValidationRule = body('login')
         }
     } )
 
+const recoveryCodeValidationRule = body('recoveryCode')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+
+const newPasswordValidationRule = body('newPassword')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+    .isLength({min: 6, max: 20}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
+
+
+
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userAdminValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
 export const userValidationMiddleware = [registrationUserEmailValidationRule, registrationUserLoginValidationRule, passwordValidationRule]
 export const blogValidationMiddleware = [nameValidationRule, descriptionValidationRule, websiteUrlValidationRule]
 export const postValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule, blogIdValidationRule]
 export const postByBlogValidationMiddleware = [titleValidationRule, shortDescriptionValidationRule, contentValidationRule]
+export const newPasswordValidationMiddleware = [newPasswordValidationRule, recoveryCodeValidationRule]
 export const commentsValidationMiddleware = [commentsValidationRule]
 export const codeValidationMiddleware = [codeValidationRule]
 export const emailValidationMiddleware = [emailValidationRule]

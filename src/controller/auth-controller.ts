@@ -11,16 +11,25 @@ import {
     EmailConfirmed,
     EmailNotFound,
     ErrorsMessages,
-    ExpiredCodeMessage,
+    ExpiredCodeMessage, RecoveryCodeIncorrectMessage,
 } from "../enum/errors-message";
 import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
 import {devicesService} from "../domain/devices-service";
+import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
 
 
-export const loginController = {
+export const authController = {
+
+    async setNewPassword(req: RequestWithBody<RecoveryPasswordModel>, res: Response) {
+        const resultUpdatePassword = await usersService.setNewPassword(req.body)
+        if (!resultUpdatePassword.success) {
+            return res.status(HTTP_STATUS.Bad_request).json(RecoveryCodeIncorrectMessage)
+        }
+        return res.sendStatus(HTTP_STATUS.No_content)
+    },
 
     async emailResending(req: RequestWithBody<EmailResending>, res: Response) {
         const resendingResult = await usersService.emailResending(req.body)
@@ -72,6 +81,13 @@ export const loginController = {
         return res.sendStatus(HTTP_STATUS.Server_error)
     },
 
+    async passwordRecovery(req: RequestWithBody<EmailResending>, res: Response) {
+        const resultPasswordRecovery = await usersService.passwordRecovery(req.body)
+        if (resultPasswordRecovery.error === Errors.Not_Found) return res.sendStatus(HTTP_STATUS.No_content)
+        if (resultPasswordRecovery.error === Errors.Error_Server) return res.sendStatus(HTTP_STATUS.Server_error)
+        return res.sendStatus(HTTP_STATUS.No_content)
+    },
+
     async getAuthUser(req: Request, res: Response) {
         const user: AdminDbModel | null = await usersQueryRepository.findUserById(req.userId!)
         if (!user) {
@@ -101,10 +117,10 @@ export const loginController = {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         const resultLogout = await devicesService.logoutUser(tokenRefresh)
-        if(resultLogout.error === Errors.Unauthorized) {
+        if (resultLogout.error === Errors.Unauthorized) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    }
+    },
 }
 

@@ -43,7 +43,11 @@ export const EmailNotFound = {
     ]
 }
 
-export enum MessagesEnum {
-    registration = 'The user has been created, an email confirmation email has been sent to your email address',
-    verified = 'Email was verified. Account was activated'
+export const RecoveryCodeIncorrectMessage = {
+    errorsMessages: [
+        {
+            message: "confirmation code is incorrect",
+            field: "recoveryCode"
+        }
+    ]
 }

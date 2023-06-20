@@ -6,4 +6,6 @@ export interface AdminDbModel {
     password: string
     login: string
     createdAt: string
+    code?: string
+    exp?: Date
 }
