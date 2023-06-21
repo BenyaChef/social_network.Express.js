@@ -29,7 +29,6 @@ export const blogsController = {
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
                       res: Response<BlogsViewSortPaginationModel>) {
         const resultSearch: BlogsViewSortPaginationModel = await blogsQueryRepository.getAllBlogs(req.query)
-        console.log(req.cookies)
         return res.status(HTTP_STATUS.OK).send(resultSearch)
     },
 

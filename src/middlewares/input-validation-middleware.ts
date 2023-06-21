@@ -2,7 +2,11 @@ import {ValidationError, validationResult} from "express-validator";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
-
+type Result<T> = {
+  resultCode: number,
+  message?: string
+    data: T
+}
 
 export const inputValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
