@@ -8,12 +8,15 @@ import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
 import {ApiRequestCountModel} from "../models/request-models/api-request-count-model";
 import {DevicesDbModel} from "../models/divice-model/devices-db-model";
+import mongoose from "mongoose";
+import {BlogsSchema} from "./schemas/blogs-schema";
 dotenv.config()
 
 const mongoURI = settings.MONGO_URI
 
 const client = new MongoClient(mongoURI)
 const DB = client.db()
+export const BlogsModel = mongoose.model<BlogModel>('blogs', BlogsSchema)
 export const blogsCollections = DB.collection<BlogModel>('blogs')
 export const postsCollections = DB.collection<PostModel>('posts')
 export const usersCollections = DB.collection<AdminDbModel>('users')
@@ -25,10 +28,12 @@ export const authDeviceCollections = DB.collection<DevicesDbModel>('auth_device'
 export async function runDB() {
     try {
         await client.connect();
+        await mongoose.connect(mongoURI)
         await DB.command({ping: 1})
         console.log('Connected successfully to mongo server')
     } catch {
         console.log("Can`t connect to db")
         await client.close();
+        await mongoose.disconnect()
     }
 }

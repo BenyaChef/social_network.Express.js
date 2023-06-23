@@ -9,10 +9,9 @@ import {resultCodeMap} from "../utils/helpers/result-code";
 
 export const blogsService = {
 
-    async createNewBlog(body: CreateBlogModel): Promise<ObjectId> {
+    async createNewBlog(body: CreateBlogModel): Promise<string> {
 
         const newBlog: CreateBlogModel = {
-            _id: new ObjectId,
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl,

@@ -1,5 +1,5 @@
 import {BlogModel} from "../../models/blogs-models/blog-model";
-import {blogsCollections} from "../../db/db";
+import {blogsCollections, BlogsModel} from "../../db/db";
 import {mapBlogs} from "../../utils/helpers/map-blogs";
 import {BlogsPaginationSortQueryModel} from "../../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../../models/blogs-models/blogs-view-sort-pagin-model";
@@ -12,7 +12,7 @@ import {ObjectId} from "mongodb";
 export const blogsQueryRepository = {
 
     async findBlogByID(id: string): Promise<BlogViewModel | null> {
-        const isFind: BlogModel | null = await blogsCollections.findOne({_id: new ObjectId(id)})
+        const isFind: BlogModel | null = await BlogsModel.findOne({_id: new ObjectId(id)})
         if (!isFind) return null
         return mapBlogs(isFind);
 

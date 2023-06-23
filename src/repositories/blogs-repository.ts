@@ -1,15 +1,15 @@
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {BlogModel} from "../models/blogs-models/blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
-import {blogsCollections} from "../db/db";
+import {blogsCollections, BlogsModel} from "../db/db";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 
 
 export const blogsRepository = {
 
-    async createNewBlog(newBlog: CreateBlogModel): Promise<ObjectId> {
-        const insertedResult = await blogsCollections.insertOne(newBlog)
-        return insertedResult.insertedId
+    async createNewBlog(newBlog: CreateBlogModel): Promise<string> {
+        const insertedResult = await BlogsModel.create(newBlog)
+        return insertedResult.id
     },
 
     async updateBlogByID(id: string, updateBlog: UpdateBlogModel): Promise<boolean> {
