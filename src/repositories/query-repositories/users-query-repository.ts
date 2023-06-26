@@ -2,10 +2,10 @@ import {UsersViewPaginationSortModel} from "../../models/users-model/users-view-
 import {UsersPaginationSortQueryModel} from "../../models/request-models/users-pagination-sort-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
 import {SortDirectionEnum} from "../../enum/sort-direction";
-import {emailCollections, usersCollections} from "../../db/db";
+import {EmailsModel, UsersModel} from "../../db/db";
 import {AdminDbModel} from "../../models/users-model/admin-db-model";
 import {mapUsers} from "../../utils/helpers/map-users";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {EmailResending} from "../../models/email-model.ts/email-confirmation-model";
 import {LoginInputModel} from "../../models/login-models/login-input-model";
 import {UserInputModel} from "../../models/users-model/user-input-model";
@@ -14,30 +14,30 @@ import {UserInputModel} from "../../models/users-model/user-input-model";
 
 export const usersQueryRepository = {
 
-    async findUserByCode(code: string) {
-        return await usersCollections.findOne({code: code})
+    async findUserByCode(code: string): Promise<WithId<AdminDbModel> | null> {
+        return UsersModel.findOne({code: code});
     },
 
     async findUserEmail(body: EmailResending) {
-        return await emailCollections.findOne({email: body.email})
+        return EmailsModel.findOne({email: body.email})
     },
 
     async findUserByEmail(body: EmailResending) {
-      return await usersCollections.findOne({email: body.email})
+      return UsersModel.findOne({email: body.email});
     },
 
-    async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<AdminDbModel | null> {
+    async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<WithId<AdminDbModel> | null> {
         let filter = {}
         if ('loginOrEmail' in body) {
             filter = {$or: [{login: body.loginOrEmail}, {email: body.loginOrEmail}]}
         } else {
             filter = {$or: [{login: body.login}, {email: body.email}]}
         }
-        return await usersCollections.findOne(filter)
+        return UsersModel.findOne(filter);
     },
 
-    async findUserById(id: ObjectId): Promise<AdminDbModel | null> {
-        const findUser = await usersCollections.findOne({_id: new ObjectId(id)})
+    async findUserById(id: ObjectId): Promise<WithId<AdminDbModel> | null> {
+        const findUser = await UsersModel.findOne({_id: new ObjectId(id)})
         if (!findUser) {
             return null
         }
@@ -54,12 +54,12 @@ export const usersQueryRepository = {
         const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchEmail, searchLogin)
         const {skipPage, totalCount, pagesCount} = processingResult
 
-        const arrUsers: AdminDbModel[] = await usersCollections
+        const arrUsers: Array<WithId<AdminDbModel>> = await UsersModel
             .find({$or: [searchEmail, searchLogin]})
             .sort({[sortBy]: sortDirection})
             .limit(+pageSize)
             .skip(skipPage)
-            .toArray()
+            .lean()
         return {
             pagesCount: pagesCount,
             page: +pageNumber,
@@ -83,7 +83,7 @@ export const usersQueryRepository = {
 
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object, searchParamTwo: object) => {
         const skipPage = (pageNumber - 1) * pageSize
-        const totalCount = await usersCollections.countDocuments({$or: [searchParamOne, searchParamTwo]})
+        const totalCount = await UsersModel.countDocuments({$or: [searchParamOne, searchParamTwo]})
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
             skipPage,

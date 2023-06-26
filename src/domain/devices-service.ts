@@ -10,7 +10,7 @@ import {ResultCodeHandler} from "../models/result-code-handler";
 import {TokensModel} from "../models/jwt-models/jwt-access-model";
 import {DevicesDbModel} from "../models/divice-model/devices-db-model";
 import {isBefore} from "date-fns";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
 import {JwtPayload} from "jsonwebtoken";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
@@ -58,7 +58,7 @@ export const devicesService = {
     },
 
     async loginDevice(body: LoginInputModel, header: IncomingHttpHeaders, ip: string): Promise<ResultCodeHandler<TokensModel>> {
-        const user: AdminDbModel | null = await usersService.checkCredentials(body)
+        const user: WithId<AdminDbModel> | null = await usersService.checkCredentials(body)
         if (!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }

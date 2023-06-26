@@ -19,6 +19,7 @@ import {EmailResending} from "../models/email-model.ts/email-confirmation-model"
 import {mapAuthUser} from "../utils/map-me-user";
 import {devicesService} from "../domain/devices-service";
 import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
+import {WithId} from "mongodb";
 
 
 export const authController = {
@@ -89,7 +90,7 @@ export const authController = {
     },
 
     async getAuthUser(req: Request, res: Response) {
-        const user: AdminDbModel | null = await usersQueryRepository.findUserById(req.userId!)
+        const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserById(req.userId!)
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }

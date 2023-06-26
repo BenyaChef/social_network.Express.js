@@ -15,7 +15,6 @@ export const postsService = {
             return resultCodeMap(false, null, Errors.Bad_Request)
         }
         const newPost: CreatePostModel = {
-            _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -33,7 +32,6 @@ export const postsService = {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
         const newPostForBlog: CreatePostModel = {
-            _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,

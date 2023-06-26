@@ -1,4 +1,4 @@
-import {ObjectId} from "mongodb";
+
 
 export interface CreateBlogModel {
     name: string,

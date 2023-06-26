@@ -1,17 +1,17 @@
 import {PostsViewSortPaginationModel} from "../../models/posts-models/posts-view-sort-pagin-model";
 import {PostModel} from "../../models/posts-models/PostModel";
-import {postsCollections} from "../../db/db";
+import {PostsModel} from "../../db/db";
 import {mapPosts} from "../../utils/helpers/map-posts";
 import {SortDirectionEnum} from "../../enum/sort-direction";
 import {PostsPaginationSortQueryModel} from "../../models/request-models/posts-paginations-sort-query-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 
 export const postsQueryRepository = {
 
     async findPostByID(id: string): Promise<PostViewModel | null> {
-        const isFind: PostModel | null = await postsCollections.findOne({_id: new ObjectId(id)})
+        const isFind: WithId<PostModel>  | null = await PostsModel.findOne({_id: new ObjectId(id)})
         if (!isFind) {
             return null
         }
@@ -26,12 +26,12 @@ export const postsQueryRepository = {
             const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize)
             const {skipPage, pagesCount, totalCount} = processingResult
 
-            const arrPosts: PostModel[] = await postsCollections
+            const arrPosts: Array<WithId<PostModel>>  = await PostsModel
                 .find({})
                 .sort({[sortBy]: sortDirection})
                 .limit(+pageSize)
                 .skip(skipPage)
-                .toArray()
+                .lean()
             return {
                 pagesCount: pagesCount,
                 page: +pageNumber,
@@ -49,12 +49,12 @@ export const postsQueryRepository = {
         const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, blogId, SortByEnum.blogId)
         const {skipPage, pagesCount, totalCount} = processingResult
 
-        const arrPosts: PostModel[] = await postsCollections
+        const arrPosts: Array<WithId<PostModel>> = await PostsModel
             .find({blogId: blogId})
             .sort({[sortBy]: sortDirection})
             .limit(+pageSize)
             .skip(skipPage)
-            .toArray()
+            .lean()
 
         if (arrPosts.length <= 0) {
             return null
@@ -82,7 +82,7 @@ export const postsQueryRepository = {
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
         const skipPage = (pageNumber - 1) * pageSize
         const filter = field !== undefined ? {[field]: value} : {}
-        const totalCount = await postsCollections.countDocuments(filter)
+        const totalCount = await PostsModel.countDocuments(filter)
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
             skipPage,

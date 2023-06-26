@@ -1,12 +1,12 @@
 import {Request, Response, Router} from "express";
 import {
-    authDeviceCollections,
-    blogsCollections,
-    commentCollections,
-    emailCollections,
-    postsCollections,
-    requestsAPI,
-    usersCollections
+    DevicesModel,
+    BlogsModel,
+    CommentsModel,
+    EmailsModel,
+    PostsModel,
+    UsersModel,
+    RequestCountsModel
 } from "../db/db";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
@@ -15,17 +15,17 @@ export const testRouter = Router({})
 
 testRouter.delete('/all-data', async (req: Request, res: Response) => {
     await Promise.all([
-        blogsCollections.deleteMany({}),
-        postsCollections.deleteMany({}),
-        usersCollections.deleteMany({}),
-        commentCollections.deleteMany({}),
-        emailCollections.deleteMany({}),
-        requestsAPI.deleteMany({}),
-        authDeviceCollections.deleteMany({})
+        BlogsModel.deleteMany({}),
+        PostsModel.deleteMany({}),
+        UsersModel.deleteMany({}),
+        CommentsModel.deleteMany({}),
+        EmailsModel.deleteMany({}),
+        RequestCountsModel.deleteMany({}),
+        DevicesModel.deleteMany({})
     ]).catch((error) => {
-            console.log(error)
-            return res.sendStatus(HTTP_STATUS.Server_error)
-        })
+        console.log(error)
+        return res.sendStatus(HTTP_STATUS.Server_error)
+    })
 
     return res.sendStatus(HTTP_STATUS.No_content)
 })

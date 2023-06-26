@@ -1,5 +1,5 @@
-import {ObjectId} from "mongodb";
-import {commentCollections} from "../../db/db";
+import {ObjectId, WithId} from "mongodb";
+import {CommentsModel} from "../../db/db";
 import {mapComment} from "../../utils/helpers/map-comment";
 import {CommentViewModel} from "../../models/comment-models/comment-view-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
@@ -11,7 +11,7 @@ import {CommentPaginationViewModel} from "../../models/comment-models/comment-pa
 export const commentsQueryRepository = {
 
     async findCommentById(id: ObjectId | string) : Promise<CommentViewModel | null> {
-        const findComment = await commentCollections.findOne({_id: new ObjectId(id)})
+        const findComment = await CommentsModel.findOne({_id: new ObjectId(id)})
         if (!findComment) {
             return null
         }
@@ -25,12 +25,12 @@ export const commentsQueryRepository = {
         const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, postId, SortByEnum.postId)
         const {skipPage, pagesCount, totalCount} = processingResult
 
-        const commentsArray: CommentDbModel[] = await commentCollections
+        const commentsArray: Array<WithId<CommentDbModel>> = await CommentsModel
             .find({postId: postId})
             .sort({[sortBy]: sortDirection})
             .limit(+pageSize)
             .skip(skipPage)
-            .toArray()
+            .lean()
 
         if(commentsArray.length <= 0) {
             return null
@@ -57,7 +57,7 @@ export const commentsQueryRepository = {
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
         const skipPage = (pageNumber - 1) * pageSize
         const filter = field !== undefined ? {[field]: value} : {}
-        const totalCount = await commentCollections.countDocuments(filter)
+        const totalCount = await CommentsModel.countDocuments(filter)
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
             skipPage,

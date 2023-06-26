@@ -1,7 +1,8 @@
 import {PostModel} from "../../models/posts-models/PostModel";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
+import {WithId} from "mongodb";
 
-export const mapPosts = (post: PostModel) : PostViewModel => {
+export const mapPosts = (post: WithId<PostModel> ) : PostViewModel => {
     return {
         id: post._id.toString(),
         title: post.title,

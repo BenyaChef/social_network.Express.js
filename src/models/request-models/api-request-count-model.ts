@@ -1,4 +1,4 @@
-export interface ApiRequestCountModel {
+export interface TypeRequestCount {
     ip: string
     URL: string
     data: Date

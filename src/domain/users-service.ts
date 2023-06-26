@@ -102,8 +102,8 @@ export const usersService = {
         return resultCodeMap(true, null)
     },
 
-    async checkCredentials(body: LoginInputModel): Promise<AdminDbModel | null> {
-        const user: AdminDbModel | null = await usersQueryRepository.findUserLoginOrEmail(body)
+    async checkCredentials(body: LoginInputModel): Promise<WithId<AdminDbModel> | null> {
+        const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserLoginOrEmail(body)
         if (!user) return null
         const encodingUser = await bcrypt.compare(body.password, user.password)
         if (!encodingUser) return null

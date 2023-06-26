@@ -1,5 +1,5 @@
 import {BlogModel} from "../../models/blogs-models/blog-model";
-import {blogsCollections, BlogsModel} from "../../db/db";
+import {BlogsModel} from "../../db/db";
 import {mapBlogs} from "../../utils/helpers/map-blogs";
 import {BlogsPaginationSortQueryModel} from "../../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../../models/blogs-models/blogs-view-sort-pagin-model";
@@ -27,12 +27,12 @@ export const blogsQueryRepository = {
         const processingResult = await this._processingPagesAndNumberOfDocuments(pageNumber, pageSize, searchName)
         const {skipPage, totalCount, pagesCount} = processingResult
 
-        const arrBlogs: BlogModel[] = await blogsCollections
+        const arrBlogs: BlogModel[] = await BlogsModel
             .find(searchName)
             .sort({[sortBy]: sortDirection})
             .limit(+pageSize)
             .skip(skipPage)
-            .toArray()
+            .lean()
         return {
             pagesCount: pagesCount,
             page: +pageNumber,
@@ -56,7 +56,7 @@ export const blogsQueryRepository = {
 
     _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object) => {
         const skipPage = (pageNumber - 1) * pageSize
-        const totalCount = await blogsCollections.countDocuments(searchParamOne)
+        const totalCount = await BlogsModel.countDocuments(searchParamOne)
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
             skipPage,

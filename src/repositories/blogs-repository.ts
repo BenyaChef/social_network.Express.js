@@ -1,8 +1,7 @@
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
-import {BlogModel} from "../models/blogs-models/blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
-import {blogsCollections, BlogsModel} from "../db/db";
-import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
+import {BlogsModel} from "../db/db";
+import {DeleteResult, ObjectId} from "mongodb";
 
 
 export const blogsRepository = {
@@ -13,14 +12,14 @@ export const blogsRepository = {
     },
 
     async updateBlogByID(id: string, updateBlog: UpdateBlogModel): Promise<boolean> {
-        const updateResult: UpdateResult<BlogModel> = await blogsCollections.updateOne({_id: new ObjectId(id)}, {$set: updateBlog})
+        const updateResult = await BlogsModel.updateOne({_id: new ObjectId(id)}, {$set: updateBlog})
         return updateResult.matchedCount === 1
 
 
     },
 
     async deleteBlogByID(id: string): Promise<boolean> {
-        const isDelete: DeleteResult = await blogsCollections.deleteOne({_id: new ObjectId(id)})
+        const isDelete: DeleteResult = await BlogsModel.deleteOne({_id: new ObjectId(id)})
         return isDelete.deletedCount === 1
     }
 }

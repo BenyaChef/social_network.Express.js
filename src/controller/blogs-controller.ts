@@ -20,7 +20,6 @@ import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-so
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {postsService} from "../domain/posts-service";
-import {ObjectId} from "mongodb";
 import {Errors} from "../enum/errors";
 
 
@@ -66,7 +65,7 @@ export const blogsController = {
 
     async createNewBlog(req: RequestWithBody<CreateBlogModel>,
                         res: Response<BlogViewModel>) {
-        const newBlogId: ObjectId = await blogsService.createNewBlog(req.body)
+        const newBlogId: string = await blogsService.createNewBlog(req.body)
 
         const newBlog = await blogsQueryRepository.findBlogByID(newBlogId.toString())
         if (!newBlog) {

@@ -4,7 +4,7 @@ import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
 
 export const mapBlogs = (blog: BlogModel): BlogViewModel => {
     return {
-        id: blog._id.toString(),
+        id: blog._id,
         name: blog.name,
         description: blog.description,
         websiteUrl: blog.websiteUrl,

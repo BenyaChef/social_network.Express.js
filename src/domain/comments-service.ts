@@ -1,4 +1,4 @@
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {InputCommentModel} from "../models/comment-models/input-coment-model";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
@@ -8,11 +8,12 @@ import {resultCodeMap} from "../utils/helpers/result-code";
 import {Errors} from "../enum/errors";
 import {ResultCodeHandler} from "../models/result-code-handler";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
+import {AdminDbModel} from "../models/users-model/admin-db-model";
 
 export const commentsService = {
 
     async createNewComment(body: InputCommentModel, userId: ObjectId, postId: string) : Promise<ObjectId | null> {
-        const user = await usersQueryRepository.findUserById(userId)
+        const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserById(userId)
         if(!user) {
             return null
         }

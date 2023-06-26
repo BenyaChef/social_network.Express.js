@@ -1,27 +1,27 @@
-import {authDeviceCollections} from "../db/db";
+import {DevicesModel} from "../db/db";
 import {DevicesDbModel} from "../models/divice-model/devices-db-model";
 
 export const deviceRepository = {
 
     async updateTokenInfo(updateDateToken: object, deviceId: string) {
-        return await authDeviceCollections.updateOne({deviceId: deviceId}, {$set: updateDateToken})
+        return DevicesModel.updateOne({deviceId: deviceId}, {$set: updateDateToken})
     },
 
     async findDeviceByDeviceId(deviceId: string) {
-        return await authDeviceCollections.findOne({deviceId: deviceId})
+        return  DevicesModel.findOne({deviceId: deviceId})
     },
 
     async saveLoginDevice(newDevice: DevicesDbModel) {
-        return await authDeviceCollections.insertOne(newDevice)
+        return  DevicesModel.create(newDevice)
     },
 
     async terminateSessions(deviceId: string) {
-        const resultDelete = await authDeviceCollections.deleteOne({deviceId: deviceId})
+        const resultDelete = await DevicesModel.deleteOne({deviceId: deviceId})
         return resultDelete.deletedCount === 1
     },
     
     async tokenDecay(deviceId: string) {
-        const decayResult = await authDeviceCollections.deleteOne({deviceId: deviceId})
+        const decayResult = await DevicesModel.deleteOne({deviceId: deviceId})
         return decayResult.deletedCount === 1
     }
 }
