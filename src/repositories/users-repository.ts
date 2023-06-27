@@ -22,7 +22,7 @@ export const usersRepository = {
 
     async resendingEmail(newConfirmationData: EmailConfirmationModel) : Promise<boolean> {
         const resultUpdateConfirmData = await EmailsModel.updateOne({email: newConfirmationData.email}, {$set: newConfirmationData})
-        return resultUpdateConfirmData.matchedCount === 1
+        return resultUpdateConfirmData.acknowledged
     },
 
     async confirmUser(body: CodeConfirmModel): Promise<ResultCodeHandler<null>> {

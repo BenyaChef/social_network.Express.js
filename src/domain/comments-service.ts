@@ -9,6 +9,7 @@ import {Errors} from "../enum/errors";
 import {ResultCodeHandler} from "../models/result-code-handler";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
+import {CommentClass} from "../classes/comment-class";
 
 export const commentsService = {
 
@@ -21,15 +22,16 @@ export const commentsService = {
         if(!post) {
             return null
         }
-        const newComment: CommentDbModel = {
-            content: body.content,
-            commentatorInfo: {
-                userId: user._id!.toString(),
-                userLogin: user.login
-            },
-            createdAt: new Date().toISOString(),
-            postId: post.id
-        }
+        const newComment: CommentDbModel = new CommentClass(body.content, userId.toString(), user.login, postId)
+        //     {
+        //     content: body.content,
+        //     commentatorInfo: {
+        //         userId: user._id!.toString(),
+        //         userLogin: user.login
+        //     },
+        //     createdAt: new Date().toISOString(),
+        //     postId: post.id
+        // }
         return await commentsRepository.createNewComment(newComment)
     },
 

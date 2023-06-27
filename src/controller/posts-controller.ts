@@ -37,7 +37,7 @@ export const postsController = {
                         res: Response) {
         const newPostResult = await postsService.createNewPost(req.body)
         if (!newPostResult.success) {
-            return res.sendStatus(HTTP_STATUS.Bad_request).json(ErrorsMessages.errorsMessages)
+            return res.sendStatus(HTTP_STATUS.Bad_request)
         }
         const newPostId = newPostResult.data!.toString()
         const newPost = await postsQueryRepository.findPostByID(newPostId)

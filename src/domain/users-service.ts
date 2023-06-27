@@ -15,12 +15,16 @@ import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
+import {AdminClass} from "../classes/admin-class";
+import {EmailConfirmationClass} from "../classes/email-confirmation-class";
+import {UsersDbModel} from "../models/users-model/users-db-model";
 
 
 export const usersService = {
 
     async emailResending(body: EmailResending): Promise<ResultCodeHandler<null>> {
         const findConfirmationData = await usersQueryRepository.findUserEmail(body)
+
         if (!findConfirmationData) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
@@ -35,7 +39,9 @@ export const usersService = {
             confirmationCode: uuidv4()
         }
         const result = await usersRepository.resendingEmail(newConfirmationData)
+
         if (!result) return resultCodeMap(false, null, Errors.Error_Server)
+
         try {
             await emailAdapter.sendEmail(findConfirmationData.email, newConfirmationData.confirmationCode)
         } catch (e) {
@@ -56,12 +62,7 @@ export const usersService = {
 
         const passwordHash = await generateHash(body.password)
 
-        const newAdmin: AdminDbModel = {
-            login: body.login,
-            email: body.email,
-            password: passwordHash,
-            createdAt: new Date().toISOString()
-        }
+        const newAdmin: AdminClass = new AdminClass(body.login, body.email, passwordHash)
         return await usersRepository.createUser(newAdmin)
 
     },
@@ -74,22 +75,11 @@ export const usersService = {
 
         const passwordHash = await generateHash(body.password)
 
-        const newUser = {
-            accountData: {
-                login: body.login,
-                email: body.email,
-                password: passwordHash,
-                createdAt: new Date().toISOString()
-            },
-            emailConfirmation: {
-                email: body.email,
-                confirmationCode: uuidv4(),
-                expirationDate: add(new Date(), {
-                    minutes: 5
-                }),
-                isConfirmed: false
-            }
+        const newUser: UsersDbModel = {
+            accountData: new AdminClass(body.login, body.email, passwordHash),
+            emailConfirmation: new EmailConfirmationClass(body.email)
         }
+
         const resultInsertUser = await usersRepository.createUser(newUser)
         if (!resultInsertUser) {
             return resultCodeMap(false, null, Errors.Error_Server)

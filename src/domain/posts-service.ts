@@ -6,6 +6,9 @@ import {blogsQueryRepository} from "../repositories/query-repositories/blogs-que
 import {ResultCodeHandler} from "../models/result-code-handler";
 import {Errors} from "../enum/errors";
 import {resultCodeMap} from "../utils/helpers/result-code";
+import {PostsClass} from "../classes/posts-class";
+
+
 
 export const postsService = {
 
@@ -14,14 +17,7 @@ export const postsService = {
         if (!blog) {
             return resultCodeMap(false, null, Errors.Bad_Request)
         }
-        const newPost: CreatePostModel = {
-            title: body.title,
-            shortDescription: body.shortDescription,
-            content: body.content,
-            blogId: body.blogId,
-            blogName: blog.name,
-            createdAt: new Date().toISOString()
-        }
+        const newPost: PostsClass = new PostsClass(body.title, body.shortDescription, body.content, blog.id, blog.name)
         const newPostId = await postsRepository.createNewPost(newPost)
         return resultCodeMap(true, newPostId)
     },
@@ -31,14 +27,7 @@ export const postsService = {
         if (!blog) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
-        const newPostForBlog: CreatePostModel = {
-            title: body.title,
-            shortDescription: body.shortDescription,
-            content: body.content,
-            blogId: blogId,
-            blogName: blog.name,
-            createdAt: new Date().toISOString()
-        }
+        const newPostForBlog: PostsClass = new PostsClass(body.title, body.shortDescription, body.content, blog.id, blog.name)
         const newPostId = await postsRepository.createNewPost(newPostForBlog)
         return resultCodeMap(true, newPostId)
     },
@@ -64,7 +53,7 @@ export const postsService = {
 
     async deletePostByID(id: string): Promise<ResultCodeHandler<null>> {
         const idDelete = await postsRepository.deletePostByID(id)
-        if(!idDelete) {
+        if (!idDelete) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
         return resultCodeMap(true, null)

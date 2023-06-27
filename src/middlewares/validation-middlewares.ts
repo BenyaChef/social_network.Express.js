@@ -1,8 +1,7 @@
 import {body} from "express-validator";
 import {ERRORS_MESSAGE} from "../enum/errors-validation-messages";
-import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {ObjectId} from "mongodb";
-import {UsersModel} from "../db/db";
+import {BlogsModel, UsersModel} from "../db/db";
 
 
 const patternUrl = '^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$'
@@ -76,9 +75,9 @@ const blogIdValidationRule = body('blogId')
     .trim()
     .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
     .matches(patternObjectId).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
-    .custom(async value => {
-        if (ObjectId.isValid(value)) {
-            const isFind = await blogsQueryRepository.findBlogByID(value)
+    .custom(async blogId => {
+        if (ObjectId.isValid(blogId)) {
+            const isFind = await BlogsModel.findOne({_id: blogId})
             if (!isFind) {
                 throw new Error(ERRORS_MESSAGE.NOT_FOUND)
             }

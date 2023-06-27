@@ -1,5 +1,3 @@
-
-
 export interface CreateBlogModel {
     name: string,
     description: string,

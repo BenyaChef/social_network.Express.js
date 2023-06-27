@@ -1,4 +1,3 @@
-import {MongoClient} from "mongodb";
 import dotenv from "dotenv";
 import {BlogModel} from "../models/blogs-models/blog-model";
 import {PostModel} from "../models/posts-models/PostModel";
@@ -21,8 +20,7 @@ dotenv.config()
 
 const mongoURI = settings.MONGO_URI
 
-const client = new MongoClient(mongoURI)
-
+// const client = new MongoClient(mongoURI)
 // const DB = client.db()
 
 export const BlogsModel = mongoose.model<BlogModel>('blogs', BlogsSchema)
@@ -30,8 +28,8 @@ export const PostsModel = mongoose.model<PostModel>('posts', PostsSchema)
 export const UsersModel = mongoose.model<AdminDbModel>('users', UsersSchema)
 export const EmailsModel = mongoose.model<EmailConfirmationModel>('emails', EmailsConfirmSchema)
 export const CommentsModel = mongoose.model<CommentDbModel>('comments', CommentsSchema)
-export const DevicesModel = mongoose.model<DevicesDbModel>('auth_device', DeviceSchema)
-export const RequestCountsModel = mongoose.model<TypeRequestCount>('api_request', RequestCountSchema)
+export const DevicesModel = mongoose.model<DevicesDbModel>('auth_devices', DeviceSchema)
+export const RequestCountsModel = mongoose.model<TypeRequestCount>('api_requests', RequestCountSchema)
 
 // export const blogsCollections = DB.collection<BlogModel>('blogs')
 // export const postsCollections = DB.collection<PostModel>('posts')
@@ -43,13 +41,14 @@ export const RequestCountsModel = mongoose.model<TypeRequestCount>('api_request'
 
 export async function runDB() {
     try {
-        // await client.connect();
         await mongoose.connect(mongoURI)
+        // await client.connect();
         // await DB.command({ping: 1})
         console.log('Connected successfully to mongo server')
     } catch {
         console.log("Can`t connect to db")
-        // await client.close();
         await mongoose.disconnect()
+        // await client.close();
+
     }
 }

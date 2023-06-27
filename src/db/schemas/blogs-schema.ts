@@ -6,5 +6,6 @@ export const BlogsSchema = new mongoose.Schema<WithId<BlogModel>>({
     name: {type: String, require: true},
     description: {type: String, require: true},
     websiteUrl: {type: String, require: true},
+    createdAt: {type: String, required: false},
     isMembership: {type: Boolean, require: true}
 })

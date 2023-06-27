@@ -1,10 +1,8 @@
-
-
 export interface CreatePostModel {
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string | undefined,
+    blogName: string,
     createdAt: string
 }
