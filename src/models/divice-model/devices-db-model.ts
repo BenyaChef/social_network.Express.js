@@ -1,4 +1,3 @@
-
 export interface DevicesDbModel {
     deviceId: string
     title: string

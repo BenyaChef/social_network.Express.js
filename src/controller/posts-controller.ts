@@ -16,13 +16,12 @@ import {PostsPaginationSortQueryModel} from "../models/request-models/posts-pagi
 import {Errors} from "../enum/errors";
 import {ErrorsMessages} from "../enum/errors-message";
 
-export const postsController = {
-
+class PostsController {
     async getAllPost(req: RequestWithQuery<PostsPaginationSortQueryModel>,
                      res: Response<PostsViewSortPaginationModel | boolean>) {
         const searchResult: PostsViewSortPaginationModel | boolean = await postsQueryRepository.getAllPost(req.query)
         return res.status(HTTP_STATUS.OK).send(searchResult)
-    },
+    }
 
     async getPostById(req: RequestWithParams<{ id: string }>,
                       res: Response<PostViewModel>) {
@@ -31,7 +30,7 @@ export const postsController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.OK).send(isFind)
-    },
+    }
 
     async createNewPost(req: RequestWithBody<CreatePostModel>,
                         res: Response) {
@@ -45,7 +44,7 @@ export const postsController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(newPost)
-    },
+    }
 
     async updatePostByID(req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
                          res: Response) {
@@ -57,7 +56,7 @@ export const postsController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 
     async deletePostByID(req: RequestWithParams<{ id: string }>,
                          res: Response) {
@@ -68,3 +67,5 @@ export const postsController = {
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
+
+export const postsController = new PostsController()

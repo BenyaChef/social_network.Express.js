@@ -19,9 +19,7 @@ import {AdminClass} from "../classes/admin-class";
 import {EmailConfirmationClass} from "../classes/email-confirmation-class";
 import {UsersDbModel} from "../models/users-model/users-db-model";
 
-
-export const usersService = {
-
+class UsersService {
     async emailResending(body: EmailResending): Promise<ResultCodeHandler<null>> {
         const findConfirmationData = await usersQueryRepository.findUserEmail(body)
 
@@ -48,15 +46,15 @@ export const usersService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
-    },
+    }
 
     async confirmUser(body: CodeConfirmModel): Promise<ResultCodeHandler<null>> {
         return await usersRepository.confirmUser(body)
-    },
+    }
 
     async getUserById(id: ObjectId): Promise<ObjectId | null> {
         return await usersRepository.findUserById(id)
-    },
+    }
 
     async createAdminUser(body: UserInputModel): Promise<ObjectId> {
 
@@ -65,7 +63,7 @@ export const usersService = {
         const newAdmin: AdminClass = new AdminClass(body.login, body.email, passwordHash)
         return await usersRepository.createUser(newAdmin)
 
-    },
+    }
 
     async createUser(body: UserInputModel): Promise<ResultCodeHandler<null>> {
         const findUser = await usersQueryRepository.findUserLoginOrEmail(body)
@@ -90,7 +88,7 @@ export const usersService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
-    },
+    }
 
     async checkCredentials(body: LoginInputModel): Promise<WithId<AdminDbModel> | null> {
         const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserLoginOrEmail(body)
@@ -98,11 +96,11 @@ export const usersService = {
         const encodingUser = await bcrypt.compare(body.password, user.password)
         if (!encodingUser) return null
         return user
-    },
+    }
 
     async deleteUsersById(id: string): Promise<boolean> {
         return await usersRepository.deleteUsersById(id)
-    },
+    }
 
     async passwordRecovery(body: EmailResending): Promise<ResultCodeHandler<null>> {
         const recoveryCode = uuidv4()
@@ -118,7 +116,7 @@ export const usersService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
 
-    },
+    }
 
     async setNewPassword(body: RecoveryPasswordModel) {
         const findUser = await usersQueryRepository.findUserByCode(body.recoveryCode)
@@ -136,3 +134,5 @@ export const usersService = {
         return resultCodeMap(true, null)
     }
 }
+
+export const usersService = new UsersService()

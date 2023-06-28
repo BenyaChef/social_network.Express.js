@@ -1,6 +1,6 @@
 export interface TypeRequestCount {
     ip: string
     URL: string
-    data: Date
+    createdAt: Date
     method: string
 }

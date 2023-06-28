@@ -11,8 +11,7 @@ import {commentsQueryRepository} from "../repositories/query-repositories/commen
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {CommentClass} from "../classes/comment-class";
 
-export const commentsService = {
-
+class CommentsService {
     async createNewComment(body: InputCommentModel, userId: ObjectId, postId: string) : Promise<ObjectId | null> {
         const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserById(userId)
         if(!user) {
@@ -22,21 +21,16 @@ export const commentsService = {
         if(!post) {
             return null
         }
-        const newComment: CommentDbModel = new CommentClass(body.content, userId.toString(), user.login, postId)
-        //     {
-        //     content: body.content,
-        //     commentatorInfo: {
-        //         userId: user._id!.toString(),
-        //         userLogin: user.login
-        //     },
-        //     createdAt: new Date().toISOString(),
-        //     postId: post.id
-        // }
+        const userDto = {
+            userId: user._id.toString(),
+            userLogin: user.login
+        }
+        const newComment: CommentDbModel = new CommentClass(body.content, userDto, postId)
         return await commentsRepository.createNewComment(newComment)
-    },
+    }
 
     async updateComments(body: InputCommentModel, userId: ObjectId, commentId: string) : Promise<ResultCodeHandler<null>> {
-            const findComment = await commentsRepository.findCommentById(commentId)
+        const findComment = await commentsRepository.findCommentById(commentId)
         if(!findComment) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
@@ -49,7 +43,7 @@ export const commentsService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
-    },
+    }
 
     async deleteComment(id: string, userId: ObjectId) : Promise<ResultCodeHandler<null>> {
         const findComment = await commentsQueryRepository.findCommentById(id)
@@ -66,3 +60,5 @@ export const commentsService = {
         return resultCodeMap(true, null)
     }
 }
+
+export const commentsService = new CommentsService()

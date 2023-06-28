@@ -5,8 +5,7 @@ import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {devicesService} from "../domain/devices-service";
 import {Errors} from "../enum/errors";
 
-export const devicesController = {
-
+class DevicesController {
     async getAllDevicesCurrentUser(req: Request, res: Response) {
         const tokenDecode = await jwtService.decodeToken(req.cookies.refreshToken)
         if (!tokenDecode) {
@@ -14,7 +13,7 @@ export const devicesController = {
         }
         const devicesCurrentUser = await deviceQueryRepository.getAllDevicesCurrentUser(tokenDecode.userId)
         return res.status(HTTP_STATUS.OK).send(devicesCurrentUser)
-    },
+    }
 
     async terminateAllOtherSessions(req: Request, res: Response) {
         const tokenDecode = await jwtService.decodeToken(req.cookies.refreshToken)
@@ -27,7 +26,7 @@ export const devicesController = {
         }
         return res.sendStatus(HTTP_STATUS.No_content)
 
-    },
+    }
 
     async terminateSpecifiedDeviceSession(req: Request, res: Response) {
         const tokenDecode = await jwtService.decodeToken(req.cookies.refreshToken)
@@ -45,3 +44,5 @@ export const devicesController = {
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
+
+export const devicesController = new DevicesController()

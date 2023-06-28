@@ -8,17 +8,16 @@ import {CommentPaginationModel} from "../../models/request-models/comment-pagina
 import {CommentDbModel} from "../../models/comment-models/comment-db-model";
 import {CommentPaginationViewModel} from "../../models/comment-models/comment-pagination-view-model";
 
-export const commentsQueryRepository = {
-
-    async findCommentById(id: ObjectId | string) : Promise<CommentViewModel | null> {
+class CommentsQueryRepository {
+    async findCommentById(id: ObjectId | string): Promise<CommentViewModel | null> {
         const findComment = await CommentsModel.findOne({_id: new ObjectId(id)})
         if (!findComment) {
             return null
         }
         return mapComment(findComment)
-    },
+    }
 
-    async findAllCommentByPostId(query: CommentPaginationModel, postId: string) : Promise<CommentPaginationViewModel | null> {
+    async findAllCommentByPostId(query: CommentPaginationModel, postId: string): Promise<CommentPaginationViewModel | null> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
         const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
@@ -32,7 +31,7 @@ export const commentsQueryRepository = {
             .skip(skipPage)
             .lean()
 
-        if(commentsArray.length <= 0) {
+        if (commentsArray.length <= 0) {
             return null
         }
         return {
@@ -42,9 +41,9 @@ export const commentsQueryRepository = {
             totalCount: totalCount,
             items: commentsArray.map(mapComment)
         }
-    },
+    }
 
-    _aggregationOfQueryParameters: (query: CommentPaginationModel) : Required<CommentPaginationModel> => {
+    _aggregationOfQueryParameters(query: CommentPaginationModel): Required<CommentPaginationModel> {
         const paramSortPagination = {
             sortBy: query.sortBy || SortByEnum.createdAt,
             sortDirection: query.sortDirection || SortDirectionEnum.desc,
@@ -52,9 +51,9 @@ export const commentsQueryRepository = {
             pageSize: query.pageSize || 10
         }
         return paramSortPagination
-    },
+    }
 
-    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, value?: string, field?: string) => {
+    async _processingPagesAndNumberOfDocuments(pageNumber: number, pageSize: number, value?: string, field?: string) {
         const skipPage = (pageNumber - 1) * pageSize
         const filter = field !== undefined ? {[field]: value} : {}
         const totalCount = await CommentsModel.countDocuments(filter)
@@ -64,5 +63,7 @@ export const commentsQueryRepository = {
             totalCount,
             pagesCount
         }
-    },
+    }
 }
+
+export const commentsQueryRepository = new CommentsQueryRepository()

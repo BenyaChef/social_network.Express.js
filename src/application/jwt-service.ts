@@ -3,18 +3,16 @@ import {settings} from "../settings";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {ObjectId, WithId} from "mongodb";
 
-
-export const jwtService = {
-
+class JwtService {
     async createAccessToken(user: WithId<AdminDbModel>) {
-        return jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '100s'})
+        return jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '600s'})
 
-    },
+    }
 
     async createRefreshToken(deviceId: string, userId: string) {
-        return jwt.sign({deviceId: deviceId, userId: userId}, settings.SECRET_KEY, {expiresIn: '200s'})
+        return jwt.sign({deviceId: deviceId, userId: userId}, settings.SECRET_KEY, {expiresIn: '3600s'})
 
-    },
+    }
 
     async verifyJWT(token: string): Promise<ObjectId | null> {
         try {
@@ -24,7 +22,7 @@ export const jwtService = {
             return null
         }
 
-    },
+    }
 
     async decodeToken(token: string) {
         try {
@@ -35,3 +33,5 @@ export const jwtService = {
 
     }
 }
+
+export const jwtService = new JwtService()

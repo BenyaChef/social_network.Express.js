@@ -10,21 +10,18 @@ import {EmailResending} from "../../models/email-model.ts/email-confirmation-mod
 import {LoginInputModel} from "../../models/login-models/login-input-model";
 import {UserInputModel} from "../../models/users-model/user-input-model";
 
-
-
-export const usersQueryRepository = {
-
+class UsersQueryRepository {
     async findUserByCode(code: string): Promise<WithId<AdminDbModel> | null> {
         return UsersModel.findOne({code: code});
-    },
+    }
 
     async findUserEmail(body: EmailResending) {
         return EmailsModel.findOne({email: body.email})
-    },
+    }
 
     async findUserByEmail(body: EmailResending) {
-      return UsersModel.findOne({email: body.email});
-    },
+        return UsersModel.findOne({email: body.email});
+    }
 
     async findUserLoginOrEmail(body: LoginInputModel | UserInputModel): Promise<WithId<AdminDbModel> | null> {
         let filter = {}
@@ -34,7 +31,7 @@ export const usersQueryRepository = {
             filter = {$or: [{login: body.login}, {email: body.email}]}
         }
         return UsersModel.findOne(filter);
-    },
+    }
 
     async findUserById(id: ObjectId): Promise<WithId<AdminDbModel> | null> {
         const findUser = await UsersModel.findOne({_id: new ObjectId(id)})
@@ -42,7 +39,7 @@ export const usersQueryRepository = {
             return null
         }
         return findUser
-    },
+    }
 
     async getAllUsers(query: UsersPaginationSortQueryModel): Promise<UsersViewPaginationSortModel> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
@@ -67,9 +64,9 @@ export const usersQueryRepository = {
             totalCount: totalCount,
             items: arrUsers.map(mapUsers)
         }
-    },
+    }
 
-    _aggregationOfQueryParameters: (query: UsersPaginationSortQueryModel): Required<UsersPaginationSortQueryModel> => {
+    _aggregationOfQueryParameters(query: UsersPaginationSortQueryModel): Required<UsersPaginationSortQueryModel> {
         const paramSortPagination = {
             searchEmailTerm: query.searchEmailTerm || null,
             searchLoginTerm: query.searchLoginTerm || null,
@@ -79,9 +76,9 @@ export const usersQueryRepository = {
             pageSize: query.pageSize || 10
         }
         return paramSortPagination
-    },
+    }
 
-    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object, searchParamTwo: object) => {
+    async _processingPagesAndNumberOfDocuments(pageNumber: number, pageSize: number, searchParamOne: object, searchParamTwo: object) {
         const skipPage = (pageNumber - 1) * pageSize
         const totalCount = await UsersModel.countDocuments({$or: [searchParamOne, searchParamTwo]})
         const pagesCount = Math.ceil(totalCount / pageSize)
@@ -92,3 +89,5 @@ export const usersQueryRepository = {
         }
     }
 }
+
+export const usersQueryRepository = new UsersQueryRepository()

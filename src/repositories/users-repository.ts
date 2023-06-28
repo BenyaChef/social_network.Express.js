@@ -9,21 +9,20 @@ import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
 import add from "date-fns/add";
 
-export const usersRepository = {
-
+class UsersRepository {
     async recoveryPassword(id: ObjectId, codeRecovery: string): Promise<boolean> {
         const recoveryInfo = {
             code: codeRecovery,
             exp: add(new Date(), {minutes: 5})
         }
-       const updateResult = await UsersModel.updateOne({_id: new ObjectId(id)}, {$set: recoveryInfo})
+        const updateResult = await UsersModel.updateOne({_id: new ObjectId(id)}, {$set: recoveryInfo})
         return updateResult.matchedCount === 1
-    },
+    }
 
     async resendingEmail(newConfirmationData: EmailConfirmationModel) : Promise<boolean> {
         const resultUpdateConfirmData = await EmailsModel.updateOne({email: newConfirmationData.email}, {$set: newConfirmationData})
         return resultUpdateConfirmData.acknowledged
-    },
+    }
 
     async confirmUser(body: CodeConfirmModel): Promise<ResultCodeHandler<null>> {
         const findUserEmailByCod = await EmailsModel.findOne({confirmationCode: body.code})
@@ -38,13 +37,13 @@ export const usersRepository = {
         }
         await EmailsModel.updateOne({email: findUserEmailByCod.email}, {$unset: {expirationDate: 1, confirmationCode: 1},  $set:{isConfirmed: true}})
         return resultCodeMap(true, null)
-    },
+    }
 
     async findUserById(id: ObjectId): Promise<ObjectId | null> {
         const findUser = await UsersModel.findOne({_id: id})
         if (!findUser) return null
         return findUser._id
-    },
+    }
 
     async createUser(newUser: AdminDbModel | UsersDbModel): Promise<ObjectId> {
         if('emailConfirmation' in newUser) {
@@ -54,7 +53,7 @@ export const usersRepository = {
         }
         const createResult = await UsersModel.create(newUser)
         return createResult.id
-    },
+    }
 
     async deleteUsersById(id: string): Promise<boolean> {
         const findUser = await UsersModel.findOne({_id: new ObjectId(id)})
@@ -64,10 +63,12 @@ export const usersRepository = {
         await EmailsModel.deleteOne({email: findUser.email})
         const isDelete: DeleteResult = await UsersModel.deleteOne({_id: new ObjectId(id)})
         return isDelete.deletedCount === 1
-    },
+    }
 
     async updatePassword(id: ObjectId, newPasswordHash: string) {
         const resultUpdate = await UsersModel.updateOne({_id: new ObjectId(id)}, {$unset:{code: 1, exp: 1}, $set: {password: newPasswordHash}})
         return resultUpdate.matchedCount === 1
-    },
+    }
 }
+
+export const usersRepository = new UsersRepository()

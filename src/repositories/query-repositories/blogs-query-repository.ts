@@ -8,15 +8,13 @@ import {SortByEnum} from "../../enum/sort-by-enum";
 import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
 import {ObjectId} from "mongodb";
 
-
-export const blogsQueryRepository = {
-
+export class BlogsQueryRepository {
     async findBlogByID(id: string): Promise<BlogViewModel | null> {
         const isFind: BlogModel | null = await BlogsModel.findOne({_id: new ObjectId(id)})
         if (!isFind) return null
         return mapBlogs(isFind);
 
-    },
+    }
 
     async getAllBlogs(query: BlogsPaginationSortQueryModel): Promise<BlogsViewSortPaginationModel> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
@@ -40,9 +38,9 @@ export const blogsQueryRepository = {
             totalCount: totalCount,
             items: arrBlogs.map(mapBlogs)
         }
-    },
+    }
 
-    _aggregationOfQueryParameters: (query: BlogsPaginationSortQueryModel): Required<BlogsPaginationSortQueryModel> => {
+    _aggregationOfQueryParameters(query: BlogsPaginationSortQueryModel): Required<BlogsPaginationSortQueryModel> {
         const paramSortPagination = {
             searchNameTerm: query.searchNameTerm || null,
             sortBy: query.sortBy || SortByEnum.createdAt,
@@ -51,10 +49,10 @@ export const blogsQueryRepository = {
             pageSize: query.pageSize || 10
         }
         return paramSortPagination
-    },
+    }
 
 
-    _processingPagesAndNumberOfDocuments: async (pageNumber: number, pageSize: number, searchParamOne: object) => {
+    async _processingPagesAndNumberOfDocuments(pageNumber: number, pageSize: number, searchParamOne: object) {
         const skipPage = (pageNumber - 1) * pageSize
         const totalCount = await BlogsModel.countDocuments(searchParamOne)
         const pagesCount = Math.ceil(totalCount / pageSize)
@@ -63,5 +61,7 @@ export const blogsQueryRepository = {
             totalCount,
             pagesCount
         }
-    },
+    }
 }
+
+export const blogsQueryRepository = new BlogsQueryRepository()

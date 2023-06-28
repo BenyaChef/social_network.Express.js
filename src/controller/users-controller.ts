@@ -9,16 +9,14 @@ import {UsersViewPaginationSortModel} from "../models/users-model/users-view-pag
 import {ObjectId} from "mongodb";
 import {mapUsers} from "../utils/helpers/map-users";
 
-
-export const usersController = {
-
+class UsersController {
     async getAllUsers(req: RequestWithQuery<UsersPaginationSortQueryModel>,
                       res: Response<UsersViewPaginationSortModel>) {
         res.status(HTTP_STATUS.OK).send(await usersQueryRepository.getAllUsers(req.query))
-    },
+    }
 
     async createAdminUser(req: RequestWithBody<UserInputModel>,
-                     res: Response) {
+                          res: Response) {
         const newUserId: ObjectId = await usersService.createAdminUser(req.body)
 
         const newUser = await usersQueryRepository.findUserById(newUserId)
@@ -26,7 +24,7 @@ export const usersController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(mapUsers(newUser))
-    },
+    }
 
     async deleteUsersById(req: RequestWithParams<{ id: string }>,
                           res: Response) {
@@ -35,3 +33,5 @@ export const usersController = {
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
+
+export const usersController = new UsersController()

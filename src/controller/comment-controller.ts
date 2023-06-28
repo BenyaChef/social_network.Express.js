@@ -9,8 +9,7 @@ import {Errors} from "../enum/errors";
 import {resultCodeHandler} from "../utils/result-code-handler";
 import {CommentViewModel} from "../models/comment-models/comment-view-model";
 
-export const commentController = {
-
+class CommentController {
     async getCommentById(req: RequestWithParams<{ id: string }>, res: Response) {
         const commentId = new ObjectId(req.params.id)
         const findComment: CommentViewModel | null = await commentsQueryRepository.findCommentById(commentId)
@@ -18,7 +17,7 @@ export const commentController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.OK).send(findComment)
-    },
+    }
 
     async getAllCommentsByPostId(req: RequestWithParamsAndQuery<{ id: string }, CommentPaginationModel>,
                                  res: Response) {
@@ -27,7 +26,7 @@ export const commentController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.OK).send(findComments)
-    },
+    }
 
     async createNewComment(req: Request, res: Response) {
         const newCommentId: ObjectId | null = await commentsService.createNewComment(req.body, req.userId!, req.params.id)
@@ -39,7 +38,7 @@ export const commentController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(newComment)
-    },
+    }
 
     async updateCommentById(req: Request, res: Response) {
         const resultUpdate = await commentsService.updateComments(req.body, req.userId!, req.params.id)
@@ -53,7 +52,7 @@ export const commentController = {
             return res.sendStatus(HTTP_STATUS.Forbidden)
         }
         return res.sendStatus(HTTP_STATUS.Server_error)
-    },
+    }
 
     async deleteCommentByID(req: Request, res: Response) {
         const resultDelete = await commentsService.deleteComment(req.params.id, req.userId!)
@@ -63,3 +62,5 @@ export const commentController = {
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
+
+export const commentController = new CommentController()

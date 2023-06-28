@@ -7,11 +7,11 @@ import {
 } from "../models/request-models/request-types";
 import {Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
-import {blogsService} from "../domain/blogs-service";
+import {BlogsService} from "../domain/blogs-service";
 import {BlogViewModel} from "../models/blogs-models/blog-view-model";
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
-import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
+import {BlogsQueryRepository, blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {BlogsPaginationSortQueryModel} from "../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../models/blogs-models/blogs-view-sort-pagin-model";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
@@ -22,23 +22,25 @@ import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {postsService} from "../domain/posts-service";
 import {Errors} from "../enum/errors";
 
-
-export const blogsController = {
+export class BlogsController {
+    constructor(protected blogsQueryRepository: BlogsQueryRepository,
+                protected blogsService: BlogsService) {
+    }
 
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
                       res: Response<BlogsViewSortPaginationModel>) {
-        const resultSearch: BlogsViewSortPaginationModel = await blogsQueryRepository.getAllBlogs(req.query)
+        const resultSearch: BlogsViewSortPaginationModel = await this.blogsQueryRepository.getAllBlogs(req.query)
         return res.status(HTTP_STATUS.OK).send(resultSearch)
-    },
+    }
 
     async findBlogById(req: RequestWithParams<{ id: string }>,
                        res: Response<BlogViewModel>) {
-        const foundBlog: BlogViewModel | null = await blogsQueryRepository.findBlogByID(req.params.id)
+        const foundBlog: BlogViewModel | null = await this.blogsQueryRepository.findBlogByID(req.params.id)
         if (!foundBlog) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.OK).send(foundBlog)
-    },
+    }
 
     async getAllPostsForBlog(req: RequestWithParamsAndQuery<{ id: string }, PostsPaginationSortQueryModel>,
                              res: Response<PostsViewSortPaginationModel>) {
@@ -47,7 +49,7 @@ export const blogsController = {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.OK).send(foundPosts)
-    },
+    }
 
     async createNewPostForBlog(req: RequestWithParamsAndBody<{ id: string }, CreatePostModel>,
                                res: Response<PostViewModel>) {
@@ -57,38 +59,39 @@ export const blogsController = {
         }
         const newPostId = newPostResult.data!.toString()
         const newPost = await postsQueryRepository.findPostByID(newPostId)
-        if(!newPost) {
+        if (!newPost) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(newPost)
-    },
+    }
 
     async createNewBlog(req: RequestWithBody<CreateBlogModel>,
                         res: Response<BlogViewModel>) {
-        const newBlogId: string = await blogsService.createNewBlog(req.body)
+        const newBlogId: string = await this.blogsService.createNewBlog(req.body)
 
         const newBlog = await blogsQueryRepository.findBlogByID(newBlogId.toString())
         if (!newBlog) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.status(HTTP_STATUS.Created).send(newBlog)
-    },
+    }
 
     async updateBlogByID(req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
                          res: Response) {
-        const isUpdate = await blogsService.updateBlogByID(req.params.id, req.body)
+        const isUpdate = await this.blogsService.updateBlogByID(req.params.id, req.body)
         if (isUpdate.error === Errors.Not_Found) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 
     async deleteBlogByID(req: RequestWithParams<{ id: string }>,
                          res: Response) {
-        const isDeleted = await blogsService.deleteBlogByID(req.params.id)
+        const isDeleted = await this.blogsService.deleteBlogByID(req.params.id)
         if (isDeleted.error === Errors.Not_Found) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
+

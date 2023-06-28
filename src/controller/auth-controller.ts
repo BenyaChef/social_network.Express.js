@@ -21,16 +21,14 @@ import {devicesService} from "../domain/devices-service";
 import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
 import {WithId} from "mongodb";
 
-
-export const authController = {
-
+class AuthController {
     async setNewPassword(req: RequestWithBody<RecoveryPasswordModel>, res: Response) {
         const resultUpdatePassword = await usersService.setNewPassword(req.body)
         if (!resultUpdatePassword.success) {
             return res.status(HTTP_STATUS.Bad_request).json(RecoveryCodeIncorrectMessage)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 
     async emailResending(req: RequestWithBody<EmailResending>, res: Response) {
         const resendingResult = await usersService.emailResending(req.body)
@@ -44,7 +42,7 @@ export const authController = {
             return res.status(HTTP_STATUS.Server_error)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 
     async confirmUser(req: RequestWithBody<CodeConfirmModel>, res: Response) {
         const isConfirm = await usersService.confirmUser(req.body)
@@ -59,7 +57,7 @@ export const authController = {
         }
         return res.sendStatus(HTTP_STATUS.No_content)
 
-    },
+    }
 
     async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
         const resultLogin = await devicesService.loginDevice(req.body, req.headers, req.ip)
@@ -69,7 +67,7 @@ export const authController = {
         return res
             .cookie('refreshToken', resultLogin.data.refreshToken, {httpOnly: true, secure: true})
             .status(HTTP_STATUS.OK).send({accessToken: resultLogin.data.accessToken})
-    },
+    }
 
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
         const resultRegistration = await usersService.createUser(req.body)
@@ -80,14 +78,14 @@ export const authController = {
             return res.sendStatus(HTTP_STATUS.No_content)
         }
         return res.sendStatus(HTTP_STATUS.Server_error)
-    },
+    }
 
     async passwordRecovery(req: RequestWithBody<EmailResending>, res: Response) {
         const resultPasswordRecovery = await usersService.passwordRecovery(req.body)
         if (resultPasswordRecovery.error === Errors.Not_Found) return res.sendStatus(HTTP_STATUS.No_content)
         if (resultPasswordRecovery.error === Errors.Error_Server) return res.sendStatus(HTTP_STATUS.Server_error)
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 
     async getAuthUser(req: Request, res: Response) {
         const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserById(req.userId!)
@@ -95,7 +93,7 @@ export const authController = {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res.status(HTTP_STATUS.OK).send(mapAuthUser(user))
-    },
+    }
 
     async generatedNewTokens(req: Request, res: Response) {
         const token = req.cookies.refreshToken
@@ -110,7 +108,7 @@ export const authController = {
             .cookie('refreshToken', resultUpdateToken.data.refreshToken, {httpOnly: true, secure: true})
             .status(HTTP_STATUS.OK)
             .send({accessToken: resultUpdateToken.data.accessToken})
-    },
+    }
 
     async logoutUser(req: Request, res: Response) {
         const tokenRefresh = req.cookies.refreshToken
@@ -122,6 +120,7 @@ export const authController = {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
-    },
+    }
 }
 
+export const authController = new AuthController()

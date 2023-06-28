@@ -15,9 +15,9 @@ import {v4 as uuidv4} from "uuid";
 import {JwtPayload} from "jsonwebtoken";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {deviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
+import {Devices} from "../classes/devices-class";
 
-export const devicesService = {
-
+class DevicesService {
     async updateRefreshToken(token: string): Promise<ResultCodeHandler<TokensModel>> {
         const decodeToken: JwtPayload | null = await jwtService.decodeToken(token)
         if (!decodeToken) {
@@ -55,13 +55,14 @@ export const devicesService = {
         }
 
         return resultCodeMap(true, newTokens)
-    },
+    }
 
     async loginDevice(body: LoginInputModel, header: IncomingHttpHeaders, ip: string): Promise<ResultCodeHandler<TokensModel>> {
         const user: WithId<AdminDbModel> | null = await usersService.checkCredentials(body)
         if (!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
+
         const deviceId = uuidv4()
         const accessToken = await jwtService.createAccessToken(user)
         const refreshToken = await jwtService.createRefreshToken(deviceId, user._id!.toString())
@@ -69,14 +70,14 @@ export const devicesService = {
         if (!tokenDecode) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const newDevice: DevicesDbModel = {
-            deviceId: tokenDecode.deviceId,
-            title: header["user-agent"] || 'agent undefined',
-            issuedAt: tokenDecode.iat!,
-            expiresAt: tokenDecode.exp!,
-            userId: user._id!.toString(),
-            ip: ip
-        }
+
+        const newDevice: DevicesDbModel = new Devices(
+            tokenDecode.deviceId,
+            header["user-agent"],
+            tokenDecode.iat!,
+            tokenDecode.exp!,
+            user._id.toString(),
+            ip)
 
         const isSave = await deviceRepository.saveLoginDevice(newDevice)
         if (!isSave) {
@@ -84,7 +85,7 @@ export const devicesService = {
         }
         const tokens = {accessToken: accessToken, refreshToken: refreshToken}
         return resultCodeMap(true, tokens)
-    },
+    }
 
     async terminateAllOtherSessions(userId: string, deviceId: string) {
         const findSessions = await deviceQueryRepository.getAllDevicesCurrentUser(userId)
@@ -94,7 +95,7 @@ export const devicesService = {
             if (session.deviceId !== deviceId) await deviceRepository.terminateSessions(session.deviceId)
         }
         return true
-    },
+    }
 
     async terminateThisSession(deviceId: string, userId: string) {
         const findSession = await deviceRepository.findDeviceByDeviceId(deviceId)
@@ -109,7 +110,7 @@ export const devicesService = {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
-    },
+    }
 
     async logoutUser(token: string) {
         const decodeToken = await jwtService.decodeToken(token)
@@ -127,3 +128,5 @@ export const devicesService = {
         return resultCodeMap(true, null)
     }
 }
+
+export const devicesService = new DevicesService()
