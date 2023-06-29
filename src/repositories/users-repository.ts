@@ -9,7 +9,7 @@ import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
 import add from "date-fns/add";
 
-class UsersRepository {
+export class UsersRepository {
     async recoveryPassword(id: ObjectId, codeRecovery: string): Promise<boolean> {
         const recoveryInfo = {
             code: codeRecovery,
@@ -71,4 +71,3 @@ class UsersRepository {
     }
 }
 
-export const usersRepository = new UsersRepository()

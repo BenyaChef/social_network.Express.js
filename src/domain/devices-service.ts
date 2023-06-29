@@ -1,8 +1,5 @@
 import {IncomingHttpHeaders} from "http";
-import {deviceRepository} from "../repositories/device-repository";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
-import {usersService} from "./users-service";
-import {jwtService} from "../application/jwt-service";
 import {LoginInputModel} from "../models/login-models/login-input-model";
 import {resultCodeMap} from "../utils/helpers/result-code";
 import {Errors} from "../enum/errors";
@@ -13,21 +10,31 @@ import {isBefore} from "date-fns";
 import {ObjectId, WithId} from "mongodb";
 import {v4 as uuidv4} from "uuid";
 import {JwtPayload} from "jsonwebtoken";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import {deviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
 import {Devices} from "../classes/devices-class";
+import {JwtService} from "../application/jwt-service";
+import {DeviceRepository} from "../repositories/device-repository";
+import {UsersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {UsersService} from "./users-service";
+import {DeviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
 
-class DevicesService {
+
+export class DevicesService {
+    constructor(protected jwtService: JwtService,
+                protected deviceRepository: DeviceRepository,
+                protected usersQueryRepository: UsersQueryRepository,
+                protected usersService: UsersService,
+                protected deviceQueryRepository: DeviceQueryRepository) {
+    }
     async updateRefreshToken(token: string): Promise<ResultCodeHandler<TokensModel>> {
-        const decodeToken: JwtPayload | null = await jwtService.decodeToken(token)
+        const decodeToken: JwtPayload | null = await this.jwtService.decodeToken(token)
         if (!decodeToken) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const device: DevicesDbModel | null = await deviceRepository.findDeviceByDeviceId(decodeToken.deviceId)
+        const device: DevicesDbModel | null = await this.deviceRepository.findDeviceByDeviceId(decodeToken.deviceId)
         if (!device) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const user = await usersQueryRepository.findUserById(new ObjectId(device.userId))
+        const user = await this.usersQueryRepository.findUserById(new ObjectId(device.userId))
         if (!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
@@ -37,15 +44,15 @@ class DevicesService {
         if (isBefore(Date.now(), decodeToken.exp!)) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const newAccessToken = await jwtService.createAccessToken(user)
-        const newRefreshToken = await jwtService.createRefreshToken(device.deviceId, user._id!.toString())
-        const decodeNewToken = await jwtService.decodeToken(newRefreshToken)
+        const newAccessToken = await this.jwtService.createAccessToken(user)
+        const newRefreshToken = await this.jwtService.createRefreshToken(device.deviceId, user._id!.toString())
+        const decodeNewToken = await this.jwtService.decodeToken(newRefreshToken)
         const updateDateToken = {
             issuedAt: decodeNewToken!.iat,
             expiresAt: decodeNewToken!.exp
         }
 
-        const updateResult = await deviceRepository.updateTokenInfo(updateDateToken, device.deviceId)
+        const updateResult = await this.deviceRepository.updateTokenInfo(updateDateToken, device.deviceId)
         if (!updateResult) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
@@ -58,15 +65,15 @@ class DevicesService {
     }
 
     async loginDevice(body: LoginInputModel, header: IncomingHttpHeaders, ip: string): Promise<ResultCodeHandler<TokensModel>> {
-        const user: WithId<AdminDbModel> | null = await usersService.checkCredentials(body)
+        const user: WithId<AdminDbModel> | null = await this.usersService.checkCredentials(body)
         if (!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
 
         const deviceId = uuidv4()
-        const accessToken = await jwtService.createAccessToken(user)
-        const refreshToken = await jwtService.createRefreshToken(deviceId, user._id!.toString())
-        const tokenDecode = await jwtService.decodeToken(refreshToken)
+        const accessToken = await this.jwtService.createAccessToken(user)
+        const refreshToken = await this.jwtService.createRefreshToken(deviceId, user._id!.toString())
+        const tokenDecode = await this.jwtService.decodeToken(refreshToken)
         if (!tokenDecode) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
@@ -79,7 +86,7 @@ class DevicesService {
             user._id.toString(),
             ip)
 
-        const isSave = await deviceRepository.saveLoginDevice(newDevice)
+        const isSave = await this.deviceRepository.saveLoginDevice(newDevice)
         if (!isSave) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
@@ -88,24 +95,24 @@ class DevicesService {
     }
 
     async terminateAllOtherSessions(userId: string, deviceId: string) {
-        const findSessions = await deviceQueryRepository.getAllDevicesCurrentUser(userId)
+        const findSessions = await this.deviceQueryRepository.getAllDevicesCurrentUser(userId)
         if (!findSessions) return false
 
         for (const session of findSessions) {
-            if (session.deviceId !== deviceId) await deviceRepository.terminateSessions(session.deviceId)
+            if (session.deviceId !== deviceId) await this.deviceRepository.terminateSessions(session.deviceId)
         }
         return true
     }
 
     async terminateThisSession(deviceId: string, userId: string) {
-        const findSession = await deviceRepository.findDeviceByDeviceId(deviceId)
+        const findSession = await this.deviceRepository.findDeviceByDeviceId(deviceId)
         if(!findSession) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
         if(findSession.userId !== userId) {
             return resultCodeMap(false, null, Errors.Forbidden)
         }
-        const resultDelete = await deviceRepository.terminateSessions(deviceId)
+        const resultDelete = await this.deviceRepository.terminateSessions(deviceId)
         if(!resultDelete) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
@@ -113,20 +120,18 @@ class DevicesService {
     }
 
     async logoutUser(token: string) {
-        const decodeToken = await jwtService.decodeToken(token)
+        const decodeToken = await this.jwtService.decodeToken(token)
         if(!decodeToken) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const user = await deviceQueryRepository.findDeviceByUserId(decodeToken.userId)
+        const user = await this.deviceQueryRepository.findDeviceByUserId(decodeToken.userId)
         if(!user) {
             return resultCodeMap(false, null, Errors.Unauthorized)
         }
-        const logoutDevice = await deviceRepository.tokenDecay(decodeToken.deviceId)
+        const logoutDevice = await this.deviceRepository.tokenDecay(decodeToken.deviceId)
         if(!logoutDevice) {
             return resultCodeMap(false, null, Errors.Error_Server)
         }
         return resultCodeMap(true, null)
     }
 }
-
-export const devicesService = new DevicesService()

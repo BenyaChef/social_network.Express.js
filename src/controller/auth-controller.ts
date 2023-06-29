@@ -1,10 +1,8 @@
 import {RequestWithBody} from "../models/request-models/request-types";
 import {LoginInputModel} from "../models/login-models/login-input-model";
 import {Request, Response} from "express";
-import {usersService} from "../domain/users-service";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {Errors} from "../enum/errors";
 import {
     CodeIncorrectMessage,
@@ -17,13 +15,19 @@ import {UserInputModel} from "../models/users-model/user-input-model";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailResending} from "../models/email-model.ts/email-confirmation-model";
 import {mapAuthUser} from "../utils/map-me-user";
-import {devicesService} from "../domain/devices-service";
 import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-password-model";
 import {WithId} from "mongodb";
+import {UsersService} from "../domain/users-service";
+import {DevicesService} from "../domain/devices-service";
+import {UsersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 
-class AuthController {
+export class AuthController {
+    constructor(protected usersService: UsersService,
+                protected devicesService: DevicesService,
+                protected usersQueryRepository: UsersQueryRepository) {
+    }
     async setNewPassword(req: RequestWithBody<RecoveryPasswordModel>, res: Response) {
-        const resultUpdatePassword = await usersService.setNewPassword(req.body)
+        const resultUpdatePassword = await this.usersService.setNewPassword(req.body)
         if (!resultUpdatePassword.success) {
             return res.status(HTTP_STATUS.Bad_request).json(RecoveryCodeIncorrectMessage)
         }
@@ -31,7 +35,7 @@ class AuthController {
     }
 
     async emailResending(req: RequestWithBody<EmailResending>, res: Response) {
-        const resendingResult = await usersService.emailResending(req.body)
+        const resendingResult = await this.usersService.emailResending(req.body)
         if (resendingResult.error === Errors.Not_Found) {
             return res.status(HTTP_STATUS.Bad_request).send(EmailNotFound)
         }
@@ -45,7 +49,7 @@ class AuthController {
     }
 
     async confirmUser(req: RequestWithBody<CodeConfirmModel>, res: Response) {
-        const isConfirm = await usersService.confirmUser(req.body)
+        const isConfirm = await this.usersService.confirmUser(req.body)
         if (isConfirm.error === Errors.Code_No_Valid) {
             return res.status(HTTP_STATUS.Bad_request).json(CodeIncorrectMessage)
         }
@@ -60,7 +64,7 @@ class AuthController {
     }
 
     async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
-        const resultLogin = await devicesService.loginDevice(req.body, req.headers, req.ip)
+        const resultLogin = await this.devicesService.loginDevice(req.body, req.headers, req.ip)
         if (!resultLogin.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
@@ -70,7 +74,7 @@ class AuthController {
     }
 
     async registrationNewUser(req: RequestWithBody<UserInputModel>, res: Response) {
-        const resultRegistration = await usersService.createUser(req.body)
+        const resultRegistration = await this.usersService.createUser(req.body)
         if (resultRegistration.error === Errors.Bad_Request) {
             return res.status(HTTP_STATUS.Bad_request).json(ErrorsMessages)
         }
@@ -81,14 +85,14 @@ class AuthController {
     }
 
     async passwordRecovery(req: RequestWithBody<EmailResending>, res: Response) {
-        const resultPasswordRecovery = await usersService.passwordRecovery(req.body)
+        const resultPasswordRecovery = await this.usersService.passwordRecovery(req.body)
         if (resultPasswordRecovery.error === Errors.Not_Found) return res.sendStatus(HTTP_STATUS.No_content)
         if (resultPasswordRecovery.error === Errors.Error_Server) return res.sendStatus(HTTP_STATUS.Server_error)
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 
     async getAuthUser(req: Request, res: Response) {
-        const user: WithId<AdminDbModel> | null = await usersQueryRepository.findUserById(req.userId!)
+        const user: WithId<AdminDbModel> | null = await this.usersQueryRepository.findUserById(req.userId!)
         if (!user) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
@@ -100,7 +104,7 @@ class AuthController {
         if (!token) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const resultUpdateToken = await devicesService.updateRefreshToken(token)
+        const resultUpdateToken = await this.devicesService.updateRefreshToken(token)
         if (!resultUpdateToken.data) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
@@ -115,12 +119,10 @@ class AuthController {
         if (!tokenRefresh) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
-        const resultLogout = await devicesService.logoutUser(tokenRefresh)
+        const resultLogout = await this.devicesService.logoutUser(tokenRefresh)
         if (resultLogout.error === Errors.Unauthorized) {
             return res.sendStatus(HTTP_STATUS.Unauthorized)
         }
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 }
-
-export const authController = new AuthController()

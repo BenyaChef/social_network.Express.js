@@ -1,7 +1,7 @@
 import {DevicesModel} from "../db/db";
 import {DevicesDbModel} from "../models/divice-model/devices-db-model";
 
-class DeviceRepository {
+export class DeviceRepository {
     async updateTokenInfo(updateDateToken: object, deviceId: string) {
         return DevicesModel.updateOne({deviceId: deviceId}, {$set: updateDateToken})
     }
@@ -24,5 +24,3 @@ class DeviceRepository {
         return decayResult.deletedCount === 1
     }
 }
-
-export const deviceRepository = new DeviceRepository()

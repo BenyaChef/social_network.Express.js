@@ -29,3 +29,4 @@ testRouter.delete('/all-data', async (req: Request, res: Response) => {
 
     return res.sendStatus(HTTP_STATUS.No_content)
 })
+

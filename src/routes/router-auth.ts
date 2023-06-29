@@ -1,5 +1,4 @@
 import {Router} from "express";
-import {authController} from "../controller/auth-controller";
 import {
     authValidationMiddleware,
     codeValidationMiddleware, emailValidationMiddleware, newPasswordValidationMiddleware,
@@ -8,51 +7,52 @@ import {
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {authJWTMiddleware} from "../middlewares/authorization-middleware";
 import {limitRequestMiddleware} from "../middlewares/limit-request";
+import {authController} from "../composition-root";
 
 export const authRouter = Router({})
 
 authRouter.get('/me',
     authJWTMiddleware,
-    authController.getAuthUser)
+    authController.getAuthUser.bind(authController))
 
 authRouter.post('/login',
     limitRequestMiddleware,
     authValidationMiddleware,
     inputValidationMiddleware,
-    authController.loginUser)
+    authController.loginUser.bind(authController))
 
 authRouter.post('/registration',
     limitRequestMiddleware,
     userValidationMiddleware,
     inputValidationMiddleware,
-    authController.registrationNewUser)
+    authController.registrationNewUser.bind(authController))
 
 authRouter.post('/registration-confirmation',
     limitRequestMiddleware,
     codeValidationMiddleware,
     inputValidationMiddleware,
-    authController.confirmUser)
+    authController.confirmUser.bind(authController))
 
 authRouter.post('/registration-email-resending',
     limitRequestMiddleware,
     emailValidationMiddleware,
     inputValidationMiddleware,
-    authController.emailResending)
+    authController.emailResending.bind(authController))
 
 authRouter.post('/refresh-token',
-    authController.generatedNewTokens)
+    authController.generatedNewTokens.bind(authController))
 
 authRouter.post('/logout',
-    authController.logoutUser)
+    authController.logoutUser.bind(authController))
 
 authRouter.post('/password-recovery',
     limitRequestMiddleware,
     emailValidationMiddleware,
     inputValidationMiddleware,
-    authController.passwordRecovery)
+    authController.passwordRecovery.bind(authController))
 
 authRouter.post('/new-password',
     limitRequestMiddleware,
     newPasswordValidationMiddleware,
     inputValidationMiddleware,
-    authController.setNewPassword)
+    authController.setNewPassword.bind(authController))

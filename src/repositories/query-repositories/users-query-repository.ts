@@ -10,7 +10,7 @@ import {EmailResending} from "../../models/email-model.ts/email-confirmation-mod
 import {LoginInputModel} from "../../models/login-models/login-input-model";
 import {UserInputModel} from "../../models/users-model/user-input-model";
 
-class UsersQueryRepository {
+export class UsersQueryRepository {
     async findUserByCode(code: string): Promise<WithId<AdminDbModel> | null> {
         return UsersModel.findOne({code: code});
     }
@@ -90,4 +90,3 @@ class UsersQueryRepository {
     }
 }
 
-export const usersQueryRepository = new UsersQueryRepository()

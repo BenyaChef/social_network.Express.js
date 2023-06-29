@@ -1,12 +1,13 @@
 import {CommentsModel} from "../db/db";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {InputCommentModel} from "../models/comment-models/input-coment-model";
 
-class CommentsRepository {
+export class CommentsRepository {
 
-    async findCommentById(id: string) : Promise<CommentDbModel | null> {
-        return CommentsModel.findOne({_id: new ObjectId(id)})
+    async findCommentById(id: string) : Promise<WithId<CommentDbModel>  | null> {
+        const comment = CommentsModel.findOne({_id: new ObjectId(id)})
+        return comment
     }
 
     async createNewComment(newComment: CommentDbModel) : Promise<ObjectId> {
@@ -25,4 +26,3 @@ class CommentsRepository {
     }
 }
 
-export const commentsRepository = new CommentsRepository()

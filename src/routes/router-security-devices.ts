@@ -1,13 +1,13 @@
 import {Router} from "express";
-import {devicesController} from "../controller/devices-controller";
+import {devicesController} from "../composition-root";
 
 export const routerSecurityDevices = Router({})
 
 routerSecurityDevices.get('/devices',
-    devicesController.getAllDevicesCurrentUser)
+    devicesController.getAllDevicesCurrentUser.bind(devicesController))
 
 routerSecurityDevices.delete('/devices',
-    devicesController.terminateAllOtherSessions)
+    devicesController.terminateAllOtherSessions.bind(devicesController))
 
 routerSecurityDevices.delete('/devices/:id',
-    devicesController.terminateSpecifiedDeviceSession)
+    devicesController.terminateSpecifiedDeviceSession.bind(devicesController))

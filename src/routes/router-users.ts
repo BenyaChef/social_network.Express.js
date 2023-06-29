@@ -1,21 +1,21 @@
 import {Router} from "express";
-import {usersController} from "../controller/users-controller";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {userAdminValidationMiddleware} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
+import {usersController} from "../composition-root";
 
 export const usersRouter = Router({})
 
 usersRouter.get('/',
     authorizationMiddleware,
-    usersController.getAllUsers)
+    usersController.getAllUsers.bind(usersController))
 
 usersRouter.post('/',
     authorizationMiddleware,
     userAdminValidationMiddleware,
     inputValidationMiddleware,
-    usersController.createAdminUser)
+    usersController.createAdminUser.bind(usersController))
 
 usersRouter.delete('/:id',
     authorizationMiddleware,
-    usersController.deleteUsersById)
+    usersController.deleteUsersById.bind(usersController))

@@ -8,7 +8,7 @@ import {SortByEnum} from "../../enum/sort-by-enum";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
 import {ObjectId, WithId} from "mongodb";
 
-class PostsQueryRepository {
+export class PostsQueryRepository {
     async findPostByID(id: string): Promise<PostViewModel | null> {
         const isFind: WithId<PostModel> | null = await PostsModel.findOne({_id: new ObjectId(id)})
         if (!isFind) {
@@ -91,4 +91,4 @@ class PostsQueryRepository {
     }
 }
 
-export const postsQueryRepository = new PostsQueryRepository()
+// export const postsQueryRepository = new PostsQueryRepository()

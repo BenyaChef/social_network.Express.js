@@ -8,7 +8,7 @@ import {CommentPaginationModel} from "../../models/request-models/comment-pagina
 import {CommentDbModel} from "../../models/comment-models/comment-db-model";
 import {CommentPaginationViewModel} from "../../models/comment-models/comment-pagination-view-model";
 
-class CommentsQueryRepository {
+export class CommentsQueryRepository {
     async findCommentById(id: ObjectId | string): Promise<CommentViewModel | null> {
         const findComment = await CommentsModel.findOne({_id: new ObjectId(id)})
         if (!findComment) {
@@ -66,4 +66,3 @@ class CommentsQueryRepository {
     }
 }
 
-export const commentsQueryRepository = new CommentsQueryRepository()

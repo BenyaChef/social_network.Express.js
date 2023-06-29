@@ -1,7 +1,7 @@
 import {DevicesModel} from "../../db/db";
 import {devicesMap} from "../../utils/helpers/devices-map";
 
-class DeviceQueryRepository {
+export class DeviceQueryRepository {
     async getAllDevicesCurrentUser(userId: string) {
         const deviceArray = await DevicesModel.find({userId: userId}).lean()
         return deviceArray.map(devicesMap)
@@ -12,4 +12,3 @@ class DeviceQueryRepository {
     }
 }
 
-export const deviceQueryRepository = new DeviceQueryRepository()

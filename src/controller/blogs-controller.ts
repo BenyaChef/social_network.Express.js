@@ -11,20 +11,22 @@ import {BlogsService} from "../domain/blogs-service";
 import {BlogViewModel} from "../models/blogs-models/blog-view-model";
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
-import {BlogsQueryRepository, blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
+import {BlogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {BlogsPaginationSortQueryModel} from "../models/request-models/blogs-pagination-sort-query-model";
 import {BlogsViewSortPaginationModel} from "../models/blogs-models/blogs-view-sort-pagin-model";
-import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
+import {PostsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-sort-pagin-model";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
-import {postsService} from "../domain/posts-service";
 import {Errors} from "../enum/errors";
+import {PostsService} from "../domain/posts-service";
 
 export class BlogsController {
     constructor(protected blogsQueryRepository: BlogsQueryRepository,
-                protected blogsService: BlogsService) {
+                protected blogsService: BlogsService,
+                protected postsQueryRepository: PostsQueryRepository,
+                protected postsService: PostsService) {
     }
 
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,
@@ -44,7 +46,7 @@ export class BlogsController {
 
     async getAllPostsForBlog(req: RequestWithParamsAndQuery<{ id: string }, PostsPaginationSortQueryModel>,
                              res: Response<PostsViewSortPaginationModel>) {
-        const foundPosts: PostsViewSortPaginationModel | null = await postsQueryRepository.getAllPostsForBlog(req.query, req.params.id)
+        const foundPosts: PostsViewSortPaginationModel | null = await this.postsQueryRepository.getAllPostsForBlog(req.query, req.params.id)
         if (!foundPosts) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -53,12 +55,12 @@ export class BlogsController {
 
     async createNewPostForBlog(req: RequestWithParamsAndBody<{ id: string }, CreatePostModel>,
                                res: Response<PostViewModel>) {
-        const newPostResult = await postsService.createNewPostForBlog(req.params.id, req.body)
+        const newPostResult = await this.postsService.createNewPostForBlog(req.params.id, req.body)
         if (newPostResult.error === Errors.Not_Found) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
         const newPostId = newPostResult.data!.toString()
-        const newPost = await postsQueryRepository.findPostByID(newPostId)
+        const newPost = await this.postsQueryRepository.findPostByID(newPostId)
         if (!newPost) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -69,7 +71,7 @@ export class BlogsController {
                         res: Response<BlogViewModel>) {
         const newBlogId: string = await this.blogsService.createNewBlog(req.body)
 
-        const newBlog = await blogsQueryRepository.findBlogByID(newBlogId.toString())
+        const newBlog = await this.blogsQueryRepository.findBlogByID(newBlogId.toString())
         if (!newBlog) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }

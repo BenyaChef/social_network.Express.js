@@ -3,7 +3,7 @@ import {settings} from "../settings";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {ObjectId, WithId} from "mongodb";
 
-class JwtService {
+export class JwtService {
     async createAccessToken(user: WithId<AdminDbModel>) {
         return jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '600s'})
 
@@ -14,7 +14,7 @@ class JwtService {
 
     }
 
-    async verifyJWT(token: string): Promise<ObjectId | null> {
+   static async verifyJWT(token: string): Promise<ObjectId | null> {
         try {
             const result: any = jwt.verify(token, settings.SECRET_KEY)
             return new ObjectId(result.userID)
@@ -34,4 +34,4 @@ class JwtService {
     }
 }
 
-export const jwtService = new JwtService()
+

@@ -4,7 +4,7 @@ import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {PostsModel} from "../db/db";
 import {DeleteResult, ObjectId, UpdateResult} from "mongodb";
 
-class PostsRepository {
+export class PostsRepository {
     async createNewPost(newPost: CreatePostModel): Promise<ObjectId> {
         const result = await PostsModel.create(newPost)
         return result.id
@@ -22,4 +22,4 @@ class PostsRepository {
     }
 }
 
-export const postsRepository = new PostsRepository()
+

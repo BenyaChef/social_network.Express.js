@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
-import {jwtService} from "../application/jwt-service";
-import {usersService} from "../domain/users-service";
-
+import {JwtService} from "../application/jwt-service";
+import {UsersModel} from "../db/db";
 
 export const authorizationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const basic64 = Buffer.from('admin:qwerty').toString('base64')
@@ -22,11 +21,11 @@ export const authJWTMiddleware = async (req: Request, res: Response, next: NextF
 
     const token = req.headers.authorization.slice(7)
 
-    const userId = await jwtService.verifyJWT(token)
+    const userId = await JwtService.verifyJWT(token)
     if (!userId) {
         return res.sendStatus(HTTP_STATUS.Unauthorized)
     }
-    req.userId = await usersService.getUserById(userId)
+    req.userId = await UsersModel.findOne({_id: userId})
     return next()
 }
 
