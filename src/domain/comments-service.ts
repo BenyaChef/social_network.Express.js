@@ -7,17 +7,33 @@ import {PostsQueryRepository} from "../repositories/query-repositories/posts-que
 import {resultCodeMap} from "../utils/helpers/result-code";
 import {Errors} from "../enum/errors";
 import {ResultCodeHandler} from "../models/result-code-handler";
-import {
-    CommentsQueryRepository,
-} from "../repositories/query-repositories/comments-query-repository";
+import {CommentsQueryRepository,} from "../repositories/query-repositories/comments-query-repository";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {CommentClass} from "../classes/comment-class";
+import {LikeInputModel} from "../models/comment-models/like-model";
+import {Like} from "../classes/like-class";
 
 export class CommentsService {
     constructor(protected usersQueryRepository: UsersQueryRepository,
                 protected postsQueryRepository: PostsQueryRepository,
                 protected commentsRepository: CommentsRepository,
                 protected commentsQueryRepository: CommentsQueryRepository) {
+    }
+
+    async processingLikeStatus(body: LikeInputModel, commentId: string, userId: ObjectId) {
+        const findLike = await this.commentsRepository.findLikeCommentThisUser(commentId, userId)
+        if (!findLike) {
+            const newLike = new Like(userId, commentId, body.likeStatus)
+            await this.commentsRepository.saveLike(newLike)
+            return resultCodeMap(true, null)
+        }
+        const resultCheckLikeStatus = await Like.likeStatusCheck(findLike!.myStatus, body.likeStatus)
+        if (!resultCheckLikeStatus) {
+            return resultCodeMap(true, null)
+        }
+        const resultUpdateLike = await this.commentsRepository.updateLike(resultCheckLikeStatus, userId, commentId)
+        if (!resultUpdateLike) return resultCodeMap(false, null, Errors.Error_Server)
+        return resultCodeMap(true, null)
     }
 
     async createNewComment(body: InputCommentModel, userId: ObjectId, postId: string): Promise<ObjectId | null> {
@@ -67,4 +83,6 @@ export class CommentsService {
         }
         return resultCodeMap(true, null)
     }
+
+
 }

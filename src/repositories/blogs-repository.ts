@@ -19,5 +19,3 @@ export class BlogsRepository {
         return isDelete.deletedCount === 1
     }
 }
-
-export const blogsRepository = new BlogsRepository()

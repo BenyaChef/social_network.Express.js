@@ -9,6 +9,7 @@ import {CommentDbModel} from "../../models/comment-models/comment-db-model";
 import {CommentPaginationViewModel} from "../../models/comment-models/comment-pagination-view-model";
 
 export class CommentsQueryRepository {
+
     async findCommentById(id: ObjectId | string): Promise<CommentViewModel | null> {
         const findComment = await CommentsModel.findOne({_id: new ObjectId(id)})
         if (!findComment) {

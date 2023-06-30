@@ -15,6 +15,17 @@ export class CommentController {
     constructor(protected commentsQueryRepository: CommentsQueryRepository,
                 protected commentsService: CommentsService) {
     }
+
+    async processingLikeStatus(req: Request, res: Response) {
+        const findComment = await this.commentsQueryRepository.findCommentById(req.params.id)
+        if(!findComment) {
+            return res.sendStatus(HTTP_STATUS.Not_found)
+        }
+        const result = await this.commentsService.processingLikeStatus(req.body, req.params.id, req.userId!)
+        if(!result.success) return res.sendStatus(HTTP_STATUS.Server_error)
+        return res.sendStatus(HTTP_STATUS.No_content)
+    }
+
     async getCommentById(req: RequestWithParams<{ id: string }>, res: Response) {
         const commentId = new ObjectId(req.params.id)
         const findComment: CommentViewModel | null = await this.commentsQueryRepository.findCommentById(commentId)

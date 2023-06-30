@@ -15,6 +15,8 @@ import {EmailsConfirmSchema} from "./schemas/emails-confirm-schema";
 import {CommentsSchema} from "./schemas/comments-schema";
 import {DeviceSchema} from "./schemas/device-schema";
 import {RequestCountSchema} from "./schemas/request-count-schema";
+import {LikeModel} from "../models/comment-models/like-model";
+import {LikesSchema} from "./schemas/likes-schema";
 
 dotenv.config()
 
@@ -30,6 +32,7 @@ export const EmailsModel = mongoose.model<EmailConfirmationModel>('emails', Emai
 export const CommentsModel = mongoose.model<CommentDbModel>('comments', CommentsSchema)
 export const DevicesModel = mongoose.model<DevicesDbModel>('auth_devices', DeviceSchema)
 export const RequestCountsModel = mongoose.model<TypeRequestCount>('api_requests', RequestCountSchema)
+export const LikesModel = mongoose.model<LikeModel>('likes-dislikes', LikesSchema)
 
 // export const blogsCollections = DB.collection<BlogModel>('blogs')
 // export const postsCollections = DB.collection<PostModel>('posts')

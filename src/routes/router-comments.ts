@@ -18,6 +18,10 @@ commentsRouter.put('/:id',
     inputValidationMiddleware,
     commentController.updateCommentById.bind(commentController))
 
+commentsRouter.put('/:id/like-status',
+    authJWTMiddleware,
+    commentController.processingLikeStatus.bind(commentController))
+
 commentsRouter.delete('/:id',
     authJWTMiddleware,
     idValidationMiddleware,
