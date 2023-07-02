@@ -29,5 +29,20 @@ export const authJWTMiddleware = async (req: Request, res: Response, next: NextF
     return next()
 }
 
+export const checkAuthUser = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) {
+        req.userId = null
+        return next()
+    }
+
+    const token = req.headers.authorization.slice(7)
+
+    const userId = await JwtService.verifyJWT(token)
+    if (!userId) {
+        return res.sendStatus(HTTP_STATUS.Unauthorized)
+    }
+    req.userId = await UsersModel.findOne({_id: userId})
+    return next()
+}
 
 

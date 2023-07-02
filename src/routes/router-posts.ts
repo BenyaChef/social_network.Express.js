@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {authJWTMiddleware, authorizationMiddleware} from "../middlewares/authorization-middleware";
+import {authJWTMiddleware, authorizationMiddleware, checkAuthUser} from "../middlewares/authorization-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 
@@ -15,6 +15,7 @@ postRouter.get('/:id',
     postsController.getPostById.bind(postsController))
 
 postRouter.get('/:id/comments',
+    checkAuthUser,
     idValidationMiddleware,
     commentController.getAllCommentsByPostId.bind(commentController))
 

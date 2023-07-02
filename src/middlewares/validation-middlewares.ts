@@ -133,6 +133,12 @@ const newPasswordValidationRule = body('newPassword')
     .isLength({min: 6, max: 20}).withMessage(ERRORS_MESSAGE.IS_LENGTH)
 
 
+const allowedValues = ['Like', 'Dislike', 'None']
+const likeValidationRule = body('likeStatus')
+    .isString().withMessage(ERRORS_MESSAGE.IS_STRING)
+    .trim()
+    .notEmpty().withMessage(ERRORS_MESSAGE.NOT_EMPTY)
+    .matches(new RegExp(`^(${allowedValues.join('|')})$`)).withMessage(ERRORS_MESSAGE.PATTERN_INCORRECT)
 
 export const authValidationMiddleware = [loginOrEmailValidationRule, passwordValidationRule]
 export const userAdminValidationMiddleware = [loginValidationRule, passwordValidationRule, emailValidationRule]
@@ -144,3 +150,4 @@ export const newPasswordValidationMiddleware = [newPasswordValidationRule, recov
 export const commentsValidationMiddleware = [commentsValidationRule]
 export const codeValidationMiddleware = [codeValidationRule]
 export const emailValidationMiddleware = [emailValidationRule]
+export const likeValidationMiddleware = [likeValidationRule]

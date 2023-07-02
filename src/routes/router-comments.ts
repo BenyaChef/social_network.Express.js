@@ -1,6 +1,9 @@
 import {Router} from "express";
-import {authJWTMiddleware} from "../middlewares/authorization-middleware";
-import {commentsValidationMiddleware} from "../middlewares/validation-middlewares";
+import {authJWTMiddleware, checkAuthUser} from "../middlewares/authorization-middleware";
+import {
+    commentsValidationMiddleware,
+    likeValidationMiddleware
+} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 import {commentController} from "../composition-root";
@@ -8,6 +11,7 @@ import {commentController} from "../composition-root";
 export const commentsRouter = Router({})
 
 commentsRouter.get('/:id',
+    checkAuthUser,
     idValidationMiddleware,
     commentController.getCommentById.bind(commentController))
 
@@ -20,6 +24,8 @@ commentsRouter.put('/:id',
 
 commentsRouter.put('/:id/like-status',
     authJWTMiddleware,
+    likeValidationMiddleware,
+    inputValidationMiddleware,
     commentController.processingLikeStatus.bind(commentController))
 
 commentsRouter.delete('/:id',

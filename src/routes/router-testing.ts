@@ -6,7 +6,7 @@ import {
     EmailsModel,
     PostsModel,
     UsersModel,
-    RequestCountsModel
+    RequestCountsModel, LikesModel
 } from "../db/db";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 
@@ -21,7 +21,8 @@ testRouter.delete('/all-data', async (req: Request, res: Response) => {
         CommentsModel.deleteMany({}),
         EmailsModel.deleteMany({}),
         RequestCountsModel.deleteMany({}),
-        DevicesModel.deleteMany({})
+        DevicesModel.deleteMany({}),
+        LikesModel.deleteMany({})
     ]).catch((error) => {
         console.log(error)
         return res.sendStatus(HTTP_STATUS.Server_error)
