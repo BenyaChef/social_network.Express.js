@@ -38,3 +38,4 @@ export class BlogsService {
         return resultCodeMap(true, null)
     }
 }
+
