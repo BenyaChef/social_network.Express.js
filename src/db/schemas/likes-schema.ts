@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import {LikeModel} from "../../models/comment-models/like-model";
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 
 export const LikesSchema = new mongoose.Schema<WithId<LikeModel>>({
-    userId: {type: ObjectId, required: true},
-    commentId: {type: String, required: true},
-    myStatus: {type: String, required: true}
+    userId: {type: mongoose.Schema.Types.ObjectId, required: true},
+    parentId: {type: String, required: true},
+    myStatus: {type: String, required: true},
+    addedAt: {type: String, required: true},
+    userName: {type: String, required: true}
 })

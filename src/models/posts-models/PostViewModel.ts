@@ -1,3 +1,5 @@
+import {LikesInfoModel} from "../comment-models/likes-info-model";
+
 export type PostViewModel = {
     id: string,
     title: string,
@@ -5,5 +7,6 @@ export type PostViewModel = {
     content: string,
     blogId: string,
     blogName: string | undefined,
-    createdAt: string
+    createdAt: string,
+    extendedLikesInfo: LikesInfoModel
 }

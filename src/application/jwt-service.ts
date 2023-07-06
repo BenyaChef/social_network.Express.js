@@ -1,8 +1,12 @@
+import "reflect-metadata";
+import {injectable} from "inversify";
 import jwt, {JwtPayload} from 'jsonwebtoken';
 import {settings} from "../settings";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {ObjectId, WithId} from "mongodb";
 
+
+@injectable()
 export class JwtService {
     async createAccessToken(user: WithId<AdminDbModel>) {
         return jwt.sign({userID: user._id}, settings.SECRET_KEY, {expiresIn: '600s'})

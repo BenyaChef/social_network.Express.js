@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {ObjectId, WithId} from "mongodb";
 import {CommentsModel, LikesModel} from "../../db/db";
 import {mapComment} from "../../utils/helpers/map-comment";
@@ -8,7 +9,10 @@ import {CommentPaginationModel} from "../../models/request-models/comment-pagina
 import {CommentDbModel} from "../../models/comment-models/comment-db-model";
 import {CommentPaginationViewModel} from "../../models/comment-models/comment-pagination-view-model";
 import {LikesStatus} from "../../enum/likes-status-enum";
+import {injectable} from "inversify";
 
+
+@injectable()
 export class CommentsQueryRepository {
 
     async findCommentById(commentId: string, userId?: ObjectId | null): Promise<CommentViewModel | null> {
@@ -75,8 +79,8 @@ export class CommentsQueryRepository {
     }
 
     private async _likesDataProcessing(commentId: string, userId?: ObjectId | null) {
-        const totalLike = await LikesModel.countDocuments({ commentId: commentId, myStatus: 'Like' })
-        const totalDisLike = await LikesModel.countDocuments({ commentId: commentId, myStatus: 'Dislike' })
+        const totalLike = await LikesModel.countDocuments({ parentId: commentId, myStatus: 'Like' })
+        const totalDisLike = await LikesModel.countDocuments({ parentId: commentId, myStatus: 'Dislike' })
         if(!userId) {
             return {
                 dislikesCount: totalDisLike,
@@ -84,7 +88,7 @@ export class CommentsQueryRepository {
                 myStatus: LikesStatus.None
             }
         }
-        const  likeStatusUser = await LikesModel.findOne({$and: [{userId: userId}, {commentId: commentId}]})
+        const  likeStatusUser = await LikesModel.findOne({$and: [{userId: userId}, {parentId: commentId}]})
         return {
             dislikesCount: totalDisLike,
             likesCount: totalLike,

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {
     RequestWithBody,
     RequestWithParams,
@@ -21,13 +22,14 @@ import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {Errors} from "../enum/errors";
 import {PostsService} from "../domain/posts-service";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class BlogsController {
-    constructor(protected blogsQueryRepository: BlogsQueryRepository,
-                protected blogsService: BlogsService,
-                protected postsQueryRepository: PostsQueryRepository,
-                protected postsService: PostsService) {
+    constructor(@inject(BlogsQueryRepository) protected blogsQueryRepository: BlogsQueryRepository,
+                @inject(BlogsService) protected blogsService: BlogsService,
+                @inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository,
+                @inject(PostsService) protected postsService: PostsService) {
     }
 
     async getAllBlogs(req: RequestWithQuery<BlogsPaginationSortQueryModel>,

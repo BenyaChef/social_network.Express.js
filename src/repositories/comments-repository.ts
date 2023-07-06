@@ -1,14 +1,17 @@
+import "reflect-metadata";
 import {CommentsModel, LikesModel} from "../db/db";
 import {ObjectId, WithId} from "mongodb";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
 import {InputCommentModel} from "../models/comment-models/input-coment-model";
 import {Like} from "../classes/like-class";
 import {LikesStatus} from "../enum/likes-status-enum";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsRepository {
 
     async updateLike(newStatusLike: LikesStatus, userId: ObjectId, commentId: string) {
-        const updateResult = await LikesModel.findOneAndUpdate({$and: [{userId: userId}, {commentId: commentId}]}, {$set: {myStatus: newStatusLike}})
+        const updateResult = await LikesModel.findOneAndUpdate({$and: [{userId: userId}, {parentId: commentId}]}, {$set: {myStatus: newStatusLike}})
         return updateResult
 
     }
@@ -19,7 +22,7 @@ export class CommentsRepository {
     }
 
     async findLikeCommentThisUser(commentId: string, userId: ObjectId) {
-        return LikesModel.findOne({$and: [{userId: userId}, {commentId: commentId}]})
+        return LikesModel.findOne({$and: [{userId: userId}, {parentId: commentId}]})
     }
 
     async findCommentById(id: string): Promise<WithId<CommentDbModel> | null> {

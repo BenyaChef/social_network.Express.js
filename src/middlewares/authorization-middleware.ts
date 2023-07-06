@@ -29,6 +29,7 @@ export const authJWTMiddleware = async (req: Request, res: Response, next: NextF
     return next()
 }
 
+
 export const checkAuthUser = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
         req.userId = null

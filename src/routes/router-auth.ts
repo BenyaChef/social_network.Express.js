@@ -7,8 +7,10 @@ import {
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {authJWTMiddleware} from "../middlewares/authorization-middleware";
 import {limitRequestMiddleware} from "../middlewares/limit-request";
-import {authController} from "../composition-root";
+import {container} from "../composition-root";
+import {AuthController} from "../controller/auth-controller";
 
+const authController = container.resolve(AuthController)
 export const authRouter = Router({})
 
 authRouter.get('/me',

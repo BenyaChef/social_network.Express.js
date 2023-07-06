@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {RequestWithBody} from "../models/request-models/request-types";
 import {LoginInputModel} from "../models/login-models/login-input-model";
 import {Request, Response} from "express";
@@ -20,11 +21,13 @@ import {WithId} from "mongodb";
 import {UsersService} from "../domain/users-service";
 import {DevicesService} from "../domain/devices-service";
 import {UsersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class AuthController {
-    constructor(protected usersService: UsersService,
-                protected devicesService: DevicesService,
-                protected usersQueryRepository: UsersQueryRepository) {
+    constructor(@inject(UsersService) protected usersService: UsersService,
+                @inject(DevicesService) protected devicesService: DevicesService,
+                @inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository) {
     }
     async setNewPassword(req: RequestWithBody<RecoveryPasswordModel>, res: Response) {
         const resultUpdatePassword = await this.usersService.setNewPassword(req.body)

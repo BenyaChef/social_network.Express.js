@@ -1,6 +1,9 @@
+import "reflect-metadata";
 import {DevicesModel} from "../db/db";
 import {DevicesDbModel} from "../models/divice-model/devices-db-model";
+import {injectable} from "inversify";
 
+@injectable()
 export class DeviceRepository {
     async updateTokenInfo(updateDateToken: object, deviceId: string) {
         return DevicesModel.updateOne({deviceId: deviceId}, {$set: updateDateToken})

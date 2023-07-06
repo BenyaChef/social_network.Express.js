@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {IncomingHttpHeaders} from "http";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {LoginInputModel} from "../models/login-models/login-input-model";
@@ -16,14 +17,15 @@ import {DeviceRepository} from "../repositories/device-repository";
 import {UsersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {UsersService} from "./users-service";
 import {DeviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class DevicesService {
-    constructor(protected jwtService: JwtService,
-                protected deviceRepository: DeviceRepository,
-                protected usersQueryRepository: UsersQueryRepository,
-                protected usersService: UsersService,
-                protected deviceQueryRepository: DeviceQueryRepository) {
+    constructor(@inject(JwtService) protected jwtService: JwtService,
+                @inject(DeviceRepository) protected deviceRepository: DeviceRepository,
+                @inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository,
+                @inject(UsersService) protected usersService: UsersService,
+                @inject(DeviceQueryRepository) protected deviceQueryRepository: DeviceQueryRepository) {
     }
     async updateRefreshToken(token: string): Promise<ResultCodeHandler<TokensModel>> {
         const decodeToken: JwtPayload | null = await this.jwtService.decodeToken(token)

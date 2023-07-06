@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {EmailsModel, UsersModel} from "../db/db";
 import {DeleteResult, ObjectId} from "mongodb";
@@ -8,8 +9,11 @@ import {Errors} from "../enum/errors";
 import {CodeConfirmModel} from "../models/users-model/code-confirm-model";
 import {EmailConfirmationModel} from "../models/email-model.ts/email-confirmation-model";
 import add from "date-fns/add";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersRepository {
+
     async recoveryPassword(id: ObjectId, codeRecovery: string): Promise<boolean> {
         const recoveryInfo = {
             code: codeRecovery,
@@ -39,10 +43,10 @@ export class UsersRepository {
         return resultCodeMap(true, null)
     }
 
-    async findUserById(id: ObjectId): Promise<ObjectId | null> {
+    async findUserById(id: ObjectId): Promise<string | null> {
         const findUser = await UsersModel.findOne({_id: id})
         if (!findUser) return null
-        return findUser._id
+        return findUser.login
     }
 
     async createUser(newUser: AdminDbModel | UsersDbModel): Promise<ObjectId> {

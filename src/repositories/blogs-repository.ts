@@ -1,8 +1,11 @@
+import "reflect-metadata";
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
 import {BlogsModel} from "../db/db";
 import {DeleteResult, ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogsRepository {
     async createNewBlog(newBlog: CreateBlogModel): Promise<string> {
         const insertedResult = await BlogsModel.create(newBlog)

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {CreateBlogModel} from "../models/blogs-models/create-blog-model";
 import {UpdateBlogModel} from "../models/blogs-models/update-blog-model";
 import {BlogsRepository} from "../repositories/blogs-repository";
@@ -5,10 +6,11 @@ import {Errors} from "../enum/errors";
 import {ResultCodeHandler} from "../models/result-code-handler";
 import {resultCodeMap} from "../utils/helpers/result-code";
 import {BlogsClass} from "../classes/blogs-class";
+import {inject, injectable} from "inversify";
 
-
+@injectable()
 export class BlogsService {
-    constructor(protected blogsRepository: BlogsRepository) {
+    constructor(@inject(BlogsRepository) protected blogsRepository: BlogsRepository) {
     }
     async createNewBlog(body: CreateBlogModel): Promise<string> {
 

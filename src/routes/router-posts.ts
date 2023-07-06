@@ -3,14 +3,26 @@ import {authJWTMiddleware, authorizationMiddleware, checkAuthUser} from "../midd
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
 
-import {commentsValidationMiddleware, postValidationMiddleware} from "../middlewares/validation-middlewares";
-import {commentController, postsController} from "../composition-root";
+import {
+    commentsValidationMiddleware,
+    likeValidationMiddleware,
+    postValidationMiddleware
+} from "../middlewares/validation-middlewares";
+import {container} from "../composition-root";
+import {PostsController} from "../controller/posts-controller";
+import {CommentController} from "../controller/comment-controller";
+
+
+const postsController = container.resolve(PostsController)
+const commentController = container.resolve(CommentController)
 
 export const postRouter = Router({})
 
-postRouter.get('/', postsController.getAllPost.bind(postsController))
+postRouter.get('/',
+    postsController.getAllPost.bind(postsController))
 
 postRouter.get('/:id',
+    checkAuthUser,
     idValidationMiddleware,
     postsController.getPostById.bind(postsController))
 
@@ -38,6 +50,12 @@ postRouter.put('/:id',
     postValidationMiddleware,
     inputValidationMiddleware,
     postsController.updatePostByID.bind(postsController))
+
+postRouter.put('/:id/like-status',
+    authJWTMiddleware,
+    likeValidationMiddleware,
+    inputValidationMiddleware,
+    postsController.processingLikeStatus.bind(postsController))
 
 postRouter.delete('/:id',
     authorizationMiddleware,

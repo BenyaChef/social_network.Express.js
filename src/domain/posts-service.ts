@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {CreatePostModel} from "../models/posts-models/CreatePostModel";
 import {UpdatePostModel} from "../models/posts-models/UpdatePostModel";
 import {ObjectId} from "mongodb";
@@ -7,11 +8,21 @@ import {ResultCodeHandler} from "../models/result-code-handler";
 import {Errors} from "../enum/errors";
 import {resultCodeMap} from "../utils/helpers/result-code";
 import {PostsClass} from "../classes/posts-class";
+import {inject, injectable} from "inversify";
+import {LikeInputModel} from "../models/comment-models/like-model";
+import {Like} from "../classes/like-class";
+import {UsersModel} from "../db/db";
+import {UsersRepository} from "../repositories/users-repository";
 
+
+@injectable()
 export class PostsService {
-    constructor(protected postsRepository: PostsRepository,
-                protected blogsQueryRepository: BlogsQueryRepository) {
+    constructor(@inject(PostsRepository) protected postsRepository: PostsRepository,
+                @inject(BlogsQueryRepository) protected blogsQueryRepository: BlogsQueryRepository,
+                @inject(UsersRepository) protected userRepository: UsersRepository) {
     }
+
+
     async createNewPost(body: CreatePostModel): Promise<ResultCodeHandler<ObjectId | null>> {
         const blog = await this.blogsQueryRepository.findBlogByID(body.blogId);
         if (!blog) {
@@ -48,6 +59,26 @@ export class PostsService {
         if (!isUpdate) {
             return resultCodeMap(false, null, Errors.Not_Found)
         }
+        return resultCodeMap(true, null)
+    }
+
+    async processingLikeStatus(body: LikeInputModel, postId: string, userId: ObjectId) {
+        const userName = await this.userRepository.findUserById(userId)
+        const post = await this.postsRepository.findPost(postId)
+        const findLike = Like.checkUserLike(post!.likes, userId)
+        if (!findLike) {
+            console.log(findLike)
+            const newLike = new Like(userId, postId, body.likeStatus, userName!)
+            await this.postsRepository.saveLike(postId, newLike)
+            return resultCodeMap(true, null)
+        }
+
+        const updateLike = Like.likeStatusCheck(findLike, body.likeStatus)
+        if (!updateLike) {
+            return resultCodeMap(true, null)
+        }
+        const resultUpdateLike = await this.postsRepository.updateLike(updateLike, userId, postId)
+        if (!resultUpdateLike) return resultCodeMap(false, null, Errors.Error_Server)
         return resultCodeMap(true, null)
     }
 

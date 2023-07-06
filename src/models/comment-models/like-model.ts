@@ -3,10 +3,18 @@ import {ObjectId} from "mongodb";
 
 export interface LikeModel {
     userId: ObjectId
-    commentId: string
+    parentId: string
+    addedAt: string
+    userName: string
     myStatus: LikesStatus
 }
 
 export interface LikeInputModel {
     likeStatus: LikesStatus
+}
+
+export type newestLikesType = {
+    addedAt: string,
+    userId: ObjectId,
+    login: string
 }

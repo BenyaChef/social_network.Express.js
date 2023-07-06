@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {BlogModel} from "../../models/blogs-models/blog-model";
 import {BlogsModel} from "../../db/db";
 import {mapBlogs} from "../../utils/helpers/map-blogs";
@@ -7,7 +8,9 @@ import {SortDirectionEnum} from "../../enum/sort-direction";
 import {SortByEnum} from "../../enum/sort-by-enum";
 import {BlogViewModel} from "../../models/blogs-models/blog-view-model";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogsQueryRepository {
     async findBlogByID(id: string): Promise<BlogViewModel | null> {
         const isFind: BlogModel | null = await BlogsModel.findOne({_id: new ObjectId(id)})

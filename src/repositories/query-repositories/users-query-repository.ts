@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {UsersViewPaginationSortModel} from "../../models/users-model/users-view-pagination-sort-model";
 import {UsersPaginationSortQueryModel} from "../../models/request-models/users-pagination-sort-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
@@ -9,7 +10,9 @@ import {ObjectId, WithId} from "mongodb";
 import {EmailResending} from "../../models/email-model.ts/email-confirmation-model";
 import {LoginInputModel} from "../../models/login-models/login-input-model";
 import {UserInputModel} from "../../models/users-model/user-input-model";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersQueryRepository {
     async findUserByCode(code: string): Promise<WithId<AdminDbModel> | null> {
         return UsersModel.findOne({code: code});

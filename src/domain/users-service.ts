@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {UserInputModel} from "../models/users-model/user-input-model";
 import bcrypt from 'bcrypt'
 import {AdminDbModel} from "../models/users-model/admin-db-model";
@@ -18,12 +19,15 @@ import {RecoveryPasswordModel} from "../models/recovery-password-model/recovery-
 import {AdminClass} from "../classes/admin-class";
 import {EmailConfirmationClass} from "../classes/email-confirmation-class";
 import {UsersDbModel} from "../models/users-model/users-db-model";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class UsersService {
-    constructor(protected usersQueryRepository: UsersQueryRepository,
-                protected usersRepository: UsersRepository,
-                protected emailAdapter: EmailAdapter) {
+    constructor(@inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository,
+                @inject(UsersRepository) protected usersRepository: UsersRepository,
+                @inject(EmailAdapter) protected emailAdapter: EmailAdapter) {
     }
+
     async emailResending(body: EmailResending): Promise<ResultCodeHandler<null>> {
         const findConfirmationData = await this.usersQueryRepository.findUserEmail(body)
 
@@ -54,10 +58,6 @@ export class UsersService {
 
     async confirmUser(body: CodeConfirmModel): Promise<ResultCodeHandler<null>> {
         return await this.usersRepository.confirmUser(body)
-    }
-
-    async getUserById(id: ObjectId): Promise<ObjectId | null> {
-        return await this.usersRepository.findUserById(id)
     }
 
     async createAdminUser(body: UserInputModel): Promise<ObjectId> {
@@ -124,16 +124,16 @@ export class UsersService {
 
     async setNewPassword(body: RecoveryPasswordModel) {
         const findUser = await this.usersQueryRepository.findUserByCode(body.recoveryCode)
-        if(!findUser) return resultCodeMap(false, null, Errors.Not_Found)
+        if (!findUser) return resultCodeMap(false, null, Errors.Not_Found)
 
-        if(findUser.code !== body.recoveryCode) return resultCodeMap(false, null, Errors.Code_No_Valid)
+        if (findUser.code !== body.recoveryCode) return resultCodeMap(false, null, Errors.Code_No_Valid)
 
-        if(findUser.exp! < new Date()) return resultCodeMap(false, null, Errors.Expiration_Date)
+        if (findUser.exp! < new Date()) return resultCodeMap(false, null, Errors.Expiration_Date)
 
         const newPasswordHash = await generateHash(body.newPassword)
         const resultUpdatePassword = await this.usersRepository.updatePassword(findUser._id, newPasswordHash)
 
-        if(!resultUpdatePassword) return resultCodeMap(false, null, Errors.Error_Server)
+        if (!resultUpdatePassword) return resultCodeMap(false, null, Errors.Error_Server)
 
         return resultCodeMap(true, null)
     }

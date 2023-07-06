@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/request-models/request-types";
 import {UserInputModel} from "../models/users-model/user-input-model";
@@ -10,11 +11,15 @@ import {ObjectId} from "mongodb";
 import {mapUsers} from "../utils/helpers/map-users";
 import {UsersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {UsersService} from "../domain/users-service";
+import {inject, injectable} from "inversify";
 
+
+@injectable()
 export class UsersController {
-    constructor(protected usersQueryRepository: UsersQueryRepository,
-                protected usersService: UsersService) {
+    constructor(@inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository,
+                @inject(UsersService) protected usersService: UsersService) {
     }
+
     async getAllUsers(req: RequestWithQuery<UsersPaginationSortQueryModel>,
                       res: Response<UsersViewPaginationSortModel>) {
         res.status(HTTP_STATUS.OK).send(await this.usersQueryRepository.getAllUsers(req.query))

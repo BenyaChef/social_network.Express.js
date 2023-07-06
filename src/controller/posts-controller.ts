@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Response} from "express";
 import {PostViewModel} from "../models/posts-models/PostViewModel";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
@@ -15,20 +16,26 @@ import {PostsViewSortPaginationModel} from "../models/posts-models/posts-view-so
 import {PostsPaginationSortQueryModel} from "../models/request-models/posts-paginations-sort-query-model";
 import {Errors} from "../enum/errors";
 import {ErrorsMessages} from "../enum/errors-message";
+import {inject, injectable} from "inversify";
+import {IdType} from "../models/id-type";
+import {LikeInputModel} from "../models/comment-models/like-model";
 
+
+@injectable()
 export class PostsController {
-    constructor(protected postsQueryRepository: PostsQueryRepository,
-                protected postsService: PostsService) {
+    constructor(@inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository,
+                @inject(PostsService) protected postsService: PostsService) {
     }
+
     async getAllPost(req: RequestWithQuery<PostsPaginationSortQueryModel>,
                      res: Response<PostsViewSortPaginationModel | boolean>) {
         const searchResult: PostsViewSortPaginationModel | boolean = await this.postsQueryRepository.getAllPost(req.query)
         return res.status(HTTP_STATUS.OK).send(searchResult)
     }
 
-    async getPostById(req: RequestWithParams<{ id: string }>,
+    async getPostById(req: RequestWithParams<IdType>,
                       res: Response<PostViewModel>) {
-        const isFind = await this.postsQueryRepository.findPostByID(req.params.id)
+        const isFind = await this.postsQueryRepository.findPostByID(req.params.id, req.userId)
         if (!isFind) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }
@@ -49,7 +56,7 @@ export class PostsController {
         return res.status(HTTP_STATUS.Created).send(newPost)
     }
 
-    async updatePostByID(req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
+    async updatePostByID(req: RequestWithParamsAndBody<IdType, UpdatePostModel>,
                          res: Response) {
         const isUpdateResult = await this.postsService.updatePostByID(req.params.id, req.body)
         if (isUpdateResult.error === Errors.Bad_Request) {
@@ -61,7 +68,19 @@ export class PostsController {
         return res.sendStatus(HTTP_STATUS.No_content)
     }
 
-    async deletePostByID(req: RequestWithParams<{ id: string }>,
+    async processingLikeStatus(req: RequestWithParamsAndBody<IdType, LikeInputModel>, res: Response) {
+        const findPost = await this.postsQueryRepository.findPostByID(req.params.id)
+        if (!findPost) {
+            return res.sendStatus(HTTP_STATUS.Not_found)
+        }
+        const result = await this.postsService.processingLikeStatus(req.body, req.params.id, req.userId!)
+        if(!result.success) {
+            return res.sendStatus(HTTP_STATUS.Server_error)
+        }
+        return res.sendStatus(HTTP_STATUS.No_content)
+    }
+
+    async deletePostByID(req: RequestWithParams<IdType>,
                          res: Response) {
         const isDelete = await this.postsService.deletePostByID(req.params.id)
         if (!isDelete.success) {

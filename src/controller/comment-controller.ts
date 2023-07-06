@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Request, Response} from "express";
 import {CommentsService} from "../domain/comments-service";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
@@ -11,10 +12,12 @@ import {Errors} from "../enum/errors";
 import {resultCodeHandler} from "../utils/result-code-handler";
 import {CommentViewModel} from "../models/comment-models/comment-view-model";
 import {CommentPaginationViewModel} from "../models/comment-models/comment-pagination-view-model";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class CommentController {
-    constructor(protected commentsQueryRepository: CommentsQueryRepository,
-                protected commentsService: CommentsService) {
+    constructor(@inject(CommentsQueryRepository) protected commentsQueryRepository: CommentsQueryRepository,
+                @inject(CommentsService) protected commentsService: CommentsService) {
     }
 
     async processingLikeStatus(req: Request, res: Response) {

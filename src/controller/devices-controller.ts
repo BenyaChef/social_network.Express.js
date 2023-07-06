@@ -1,14 +1,17 @@
+import "reflect-metadata";
 import {Request, Response} from "express";
 import {HTTP_STATUS} from "../enum/enum-HTTP-status";
 import {Errors} from "../enum/errors";
 import {JwtService} from "../application/jwt-service";
 import {DeviceQueryRepository} from "../repositories/query-repositories/device-query-repository";
 import {DevicesService} from "../domain/devices-service";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class DevicesController {
-    constructor(protected jwtService: JwtService,
-                protected deviceQueryRepository: DeviceQueryRepository,
-                protected devicesService: DevicesService) {
+    constructor(@inject(JwtService) protected jwtService: JwtService,
+                @inject(DeviceQueryRepository) protected deviceQueryRepository: DeviceQueryRepository,
+                @inject(DevicesService) protected devicesService: DevicesService) {
     }
     async getAllDevicesCurrentUser(req: Request, res: Response) {
         const tokenDecode = await this.jwtService.decodeToken(req.cookies.refreshToken)

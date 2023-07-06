@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {ObjectId, WithId} from "mongodb";
 import {InputCommentModel} from "../models/comment-models/input-coment-model";
 import {CommentDbModel} from "../models/comment-models/comment-db-model";
@@ -12,12 +13,14 @@ import {AdminDbModel} from "../models/users-model/admin-db-model";
 import {CommentClass} from "../classes/comment-class";
 import {LikeInputModel} from "../models/comment-models/like-model";
 import {Like} from "../classes/like-class";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class CommentsService {
-    constructor(protected usersQueryRepository: UsersQueryRepository,
-                protected postsQueryRepository: PostsQueryRepository,
-                protected commentsRepository: CommentsRepository,
-                protected commentsQueryRepository: CommentsQueryRepository) {
+    constructor(@inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository,
+                @inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository,
+                @inject(CommentsRepository) protected commentsRepository: CommentsRepository,
+                @inject(CommentsQueryRepository) protected commentsQueryRepository: CommentsQueryRepository) {
     }
 
     async processingLikeStatus(body: LikeInputModel, commentId: string, userId: ObjectId) {
@@ -27,7 +30,7 @@ export class CommentsService {
             await this.commentsRepository.saveLike(newLike)
             return resultCodeMap(true, null)
         }
-        const resultCheckLikeStatus = await Like.likeStatusCheck(findLike!.myStatus, body.likeStatus)
+        const resultCheckLikeStatus = Like.likeStatusCheck(findLike!.myStatus, body.likeStatus)
         if (!resultCheckLikeStatus) {
             return resultCodeMap(true, null)
         }

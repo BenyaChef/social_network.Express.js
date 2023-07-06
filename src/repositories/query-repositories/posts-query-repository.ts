@@ -1,20 +1,24 @@
+import "reflect-metadata";
 import {PostsViewSortPaginationModel} from "../../models/posts-models/posts-view-sort-pagin-model";
 import {PostModel} from "../../models/posts-models/PostModel";
-import {PostsModel} from "../../db/db";
+import {LikesModel, PostsModel, UsersModel} from "../../db/db";
 import {mapPosts} from "../../utils/helpers/map-posts";
 import {SortDirectionEnum} from "../../enum/sort-direction";
 import {PostsPaginationSortQueryModel} from "../../models/request-models/posts-paginations-sort-query-model";
 import {SortByEnum} from "../../enum/sort-by-enum";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
 import {ObjectId, WithId} from "mongodb";
+import {injectable} from "inversify";
+import {LikesStatus} from "../../enum/likes-status-enum";
 
+@injectable()
 export class PostsQueryRepository {
-    async findPostByID(id: string): Promise<PostViewModel | null> {
-        const isFind: WithId<PostModel> | null = await PostsModel.findOne({_id: new ObjectId(id)})
-        if (!isFind) {
-            return null
-        }
-        return mapPosts(isFind)
+
+    async findPostByID(postId: string, userId: ObjectId | null): Promise<PostViewModel | null> {
+        const findPost: WithId<PostModel> | null = await PostsModel.findOne({_id: new ObjectId(postId)})
+        if (!findPost) return null
+
+        return mapPosts(findPost, userId)
     }
 
 
@@ -89,6 +93,6 @@ export class PostsQueryRepository {
             pagesCount
         }
     }
+
 }
 
-// export const postsQueryRepository = new PostsQueryRepository()

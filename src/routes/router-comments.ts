@@ -6,8 +6,11 @@ import {
 } from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
-import {commentController} from "../composition-root";
+import {container} from "../composition-root";
+import {CommentController} from "../controller/comment-controller";
 
+
+const commentController = container.resolve(CommentController)
 export const commentsRouter = Router({})
 
 commentsRouter.get('/:id',

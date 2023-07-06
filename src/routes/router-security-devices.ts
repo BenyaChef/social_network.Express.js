@@ -1,6 +1,8 @@
 import {Router} from "express";
-import {devicesController} from "../composition-root";
+import {container} from "../composition-root";
+import {DevicesController} from "../controller/devices-controller";
 
+const devicesController = container.resolve(DevicesController)
 export const routerSecurityDevices = Router({})
 
 routerSecurityDevices.get('/devices',
