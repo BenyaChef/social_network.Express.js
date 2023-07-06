@@ -7,5 +7,5 @@ export const LikesSchema = new mongoose.Schema<WithId<LikeModel>>({
     parentId: {type: String, required: true},
     myStatus: {type: String, required: true},
     addedAt: {type: String, required: true},
-    userName: {type: String, required: true}
+    userName: {type: String, required: false}
 })

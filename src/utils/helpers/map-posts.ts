@@ -7,7 +7,7 @@ import {newestLikesType} from "../../models/comment-models/like-model";
 
 export const mapPosts = (post: WithId<PostModel>, userID: ObjectId | null): PostViewModel => {
     const myStatus = userID !== null ? post.likes.find(like => like.userId.equals(new ObjectId(userID))) : undefined
-    const lastLikes = post.likes.filter(like => like.myStatus === LikesStatus.Like).slice(-3)
+    const lastLikes = post.likes.filter(like => like.myStatus === LikesStatus.Like).slice(-3) .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime())
     const likeCount = post.likes.filter(like => like.myStatus === LikesStatus.Like).length
     const dislikeCount = post.likes.filter(like => like.myStatus === LikesStatus.Dislike).length
     const newestLikes: newestLikesType[] = lastLikes.map((like) => {

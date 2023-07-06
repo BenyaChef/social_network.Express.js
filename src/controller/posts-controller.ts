@@ -69,7 +69,7 @@ export class PostsController {
     }
 
     async processingLikeStatus(req: RequestWithParamsAndBody<IdType, LikeInputModel>, res: Response) {
-        const findPost = await this.postsQueryRepository.findPostByID(req.params.id)
+        const findPost = await this.postsQueryRepository.findPostByID(req.params.id, req.userId)
         if (!findPost) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }

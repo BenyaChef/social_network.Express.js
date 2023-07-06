@@ -67,7 +67,6 @@ export class PostsService {
         const post = await this.postsRepository.findPost(postId)
         const findLike = Like.checkUserLike(post!.likes, userId)
         if (!findLike) {
-            console.log(findLike)
             const newLike = new Like(userId, postId, body.likeStatus, userName!)
             await this.postsRepository.saveLike(postId, newLike)
             return resultCodeMap(true, null)

@@ -28,6 +28,7 @@ export class Like {
             userId: like.userId,
             parentId: like.parentId,
             addedAt: like.addedAt,
+            userName: like.userName,
             myStatus: body
         }
 

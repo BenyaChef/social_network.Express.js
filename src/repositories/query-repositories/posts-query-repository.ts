@@ -9,12 +9,12 @@ import {SortByEnum} from "../../enum/sort-by-enum";
 import {PostViewModel} from "../../models/posts-models/PostViewModel";
 import {ObjectId, WithId} from "mongodb";
 import {injectable} from "inversify";
-import {LikesStatus} from "../../enum/likes-status-enum";
+
 
 @injectable()
 export class PostsQueryRepository {
 
-    async findPostByID(postId: string, userId: ObjectId | null): Promise<PostViewModel | null> {
+    async findPostByID(postId: string, userId: ObjectId | null = null): Promise<PostViewModel | null> {
         const findPost: WithId<PostModel> | null = await PostsModel.findOne({_id: new ObjectId(postId)})
         if (!findPost) return null
 
