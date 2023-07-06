@@ -22,7 +22,7 @@ export class PostsQueryRepository {
     }
 
 
-    async getAllPost(query: PostsPaginationSortQueryModel): Promise<PostsViewSortPaginationModel | boolean> {
+    async getAllPost(query: PostsPaginationSortQueryModel, userId: ObjectId | null = null): Promise<PostsViewSortPaginationModel | boolean> {
         const aggregationResult = this._aggregationOfQueryParameters(query)
         const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
@@ -40,12 +40,12 @@ export class PostsQueryRepository {
             page: +pageNumber,
             pageSize: +pageSize,
             totalCount: totalCount,
-            items: arrPosts.map(mapPosts)
+            items: arrPosts.map(post => mapPosts(post, userId))
         }
 
     }
 
-    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string): Promise<PostsViewSortPaginationModel | null> {
+    async getAllPostsForBlog(query: PostsPaginationSortQueryModel, blogId: string, userId: ObjectId | null = null): Promise<PostsViewSortPaginationModel | null> {
         const aggregationResult = await this._aggregationOfQueryParameters(query)
         const {sortBy, sortDirection, pageNumber, pageSize} = aggregationResult
 
@@ -68,7 +68,7 @@ export class PostsQueryRepository {
             page: +pageNumber,
             pageSize: +pageSize,
             totalCount: totalCount,
-            items: arrPosts.map(mapPosts)
+            items: arrPosts.map(post => mapPosts(post, userId))
         }
     }
 

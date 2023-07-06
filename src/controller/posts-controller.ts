@@ -29,7 +29,7 @@ export class PostsController {
 
     async getAllPost(req: RequestWithQuery<PostsPaginationSortQueryModel>,
                      res: Response<PostsViewSortPaginationModel | boolean>) {
-        const searchResult: PostsViewSortPaginationModel | boolean = await this.postsQueryRepository.getAllPost(req.query)
+        const searchResult: PostsViewSortPaginationModel | boolean = await this.postsQueryRepository.getAllPost(req.query, req.userId)
         return res.status(HTTP_STATUS.OK).send(searchResult)
     }
 

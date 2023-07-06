@@ -49,7 +49,7 @@ export class BlogsController {
 
     async getAllPostsForBlog(req: RequestWithParamsAndQuery<{ id: string }, PostsPaginationSortQueryModel>,
                              res: Response<PostsViewSortPaginationModel>) {
-        const foundPosts: PostsViewSortPaginationModel | null = await this.postsQueryRepository.getAllPostsForBlog(req.query, req.params.id)
+        const foundPosts: PostsViewSortPaginationModel | null = await this.postsQueryRepository.getAllPostsForBlog(req.query, req.params.id, req.userId)
         if (!foundPosts) {
             return res.sendStatus(HTTP_STATUS.Not_found)
         }

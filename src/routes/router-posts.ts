@@ -19,6 +19,7 @@ const commentController = container.resolve(CommentController)
 export const postRouter = Router({})
 
 postRouter.get('/',
+    checkAuthUser,
     postsController.getAllPost.bind(postsController))
 
 postRouter.get('/:id',

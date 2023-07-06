@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {authorizationMiddleware} from "../middlewares/authorization-middleware";
+import {authorizationMiddleware, checkAuthUser} from "../middlewares/authorization-middleware";
 import {blogValidationMiddleware, postByBlogValidationMiddleware} from "../middlewares/validation-middlewares";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {idValidationMiddleware} from "../middlewares/id-validation-middleware";
@@ -19,6 +19,7 @@ blogRouter.get('/:id',
 
 
 blogRouter.get('/:id/posts/',
+    checkAuthUser,
     idValidationMiddleware,
     blogsController.getAllPostsForBlog.bind(blogsController))
 
